@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">TraaaaBot Console</title>
+    <link rel="stylesheet" href="../../node_modules/xterm/css/xterm.css">
+    <link rel="stylesheet" href="titlebar/titlebar.css">
+    <link rel="stylesheet" href="css/dialogs.css">
+    <link rel="stylesheet" href="styles.css">
+    <link type="text/css" rel="stylesheet" href="material/materialize.min.css" media="screen,projection">
+    <link rel="stylesheet" href="material/style.css" media="screen" title="no title" charset="utf-8">
+    <script src="../../node_modules/xterm/lib/xterm.js"></script>
+</head>
+<body>
+    <!-- Title Bar -->
+    <header id="titlebar">
+        <div id="drag-region">
+            <div id="window-title">
+                <img src="../../TraaaaBot.iconset/icon_512x512@2x@2x.png" alt="App Icon" width="24" height="24" style="margin-right: 10px;">
+                <span>TraaaaBot Console</span>
+            </div>
+            <div id="window-controls">
+                <div class="button" id="close-button">
+                    <!-- Windows close button icon -->
+                    <img class="icon windows" srcset="titlebar/icons/close-w-10.png 1x, titlebar/icons/close-w-12.png 1.25x, ..." draggable="false" />
+                </div>
+                <div class="button" id="max-button">
+                    <!-- Windows maximize button icon -->
+                    <img class="icon windows" srcset="titlebar/icons/max-w-10.png 1x, ..." draggable="false" />
+                </div>
+                <div class="button" id="restore-button">
+                    <!-- Windows restore button icon -->
+                    <img class="icon windows" srcset="titlebar/icons/restore-w-10.png 1x, ..." draggable="false" />
+                </div>
+                <div class="button" id="min-button">
+                    <!-- Windows minimize button icon -->
+                    <img class="icon windows" srcset="titlebar/icons/min-w-10.png 1x, ..." draggable="false" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="timer-container" style="display: none;">
+        <div id="timer-text">
+            <span class="dot" style="color: red;">&#8226;</span>
+            <span id="timer">00:00:00</span>
+        </div>
+    </div>
+
+    <!-- Section One -->
+    <div id="section-one">
+        <img src="../../TraaaaBot.iconset/icon_512x512@2x@2x.png" alt="App Icon" width="100" height="100">
+        <h1>TraaaaBot</h1>
+        <p>Before getting started, click Settings to view the settings for the bot and check if everything is correct.</p>
+        <p>To begin, click the Start button below or type <code style="font-family: monospace; background-color: #373737;">start</code> in the console.</p>
+        <div id="button-container">
+            <button class="waves-effect waves-light btn snackbar" data-pos="top-right" id="startBotButton">Start</button>
+            <button class="waves-effect waves-light btn snackbar" data-pos="top-right" id="stopBotButton" disabled>Stop</button>
+            <button class="waves-effect waves-light btn snackbar" data-pos="top-right" id="settingsButton">Settings</button>
+        </div>
+    </div>
+
+    <!-- Terminal Container -->
+    <div id="container">
+        <div id="terminal"></div>
+    </div>
+
+    <!-- Error Bar -->
+    <div id="error-bar" class="error-bar" style="display: none;">
+        <a href="#" id="error-copy" class="error-copy" onclick="copyErrorText()">Copy</a>
+        <span id="error-close" class="error-close" onclick="closeErrorBar()">x</span>
+        <span id="error-message" class="error-text">example err</span>
+    </div>
+
+    <!-- Problematic IP Dialog -->
+    <div id="blacklist-ip-dialog" class="dialog">
+        <div class="dialog-content">
+            <h2>IP Blacklisted</h2>
+            <p>Your IP address is blacklisted on the GXX: by electrasys API and cannot be used to start TraaaaBot.</p>
+            <p>You can modify settings for the bot with some limitations, but you will be unable to start the bot with the new changes.</p>
+            <div class="dialog-buttons">
+                <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="blacklist-ip-ok-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stop Bot Dialog -->
+    <div id="stop-dialog" class="dialog">
+        <div class="dialog-content">
+            <h2>Stop Bot?</h2>
+            <p>Are you sure you want to stop the bot process?</p>
+            <div class="dialog-buttons">
+                <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="stop-yes-button">Yes</button>
+                <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="stop-no-button">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Necessary Scripts -->
+    <script type="text/javascript" src="script.js"></script>
+    <script type="module" src="terminal.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="titlebar/renderer.js" charset="utf-8"></script>
+</body>
+</html>
