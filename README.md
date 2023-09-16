@@ -13,6 +13,7 @@
   <p align="center">
     A multi-purpose Discord bot written in discord.js that focuses on moderation, server management, and fun commmands for the public. The name originated from the idea that Traaaanns Hangout on Discord had many bots that have become unusable due their frequent outages and lack of features that are crucial for the server. This bot is a hobby project that aims to fix those problems, and has expanded to serve other communities as well. Servers who use TraaaaBot are also acknowledging that their server is a safe space for the trans community. The bot has been written independently by electrasys with JavaScript.
     <br/>
+    <br/>
     RIP Traaaanns Hangout :(
     <br/>
     <br/>
