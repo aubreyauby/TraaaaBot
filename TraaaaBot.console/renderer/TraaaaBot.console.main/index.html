@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">TraaaaBot Console</title>
-    <link rel="stylesheet" href="../../node_modules/xterm/css/xterm.css">
+    <link rel="stylesheet" href="../../../node_modules/xterm/css/xterm.css">
     <link rel="stylesheet" href="titlebar/titlebar.css">
     <link rel="stylesheet" href="css/dialogs.css">
     <link rel="stylesheet" href="styles.css">
     <link type="text/css" rel="stylesheet" href="material/materialize.min.css" media="screen,projection">
     <link rel="stylesheet" href="material/style.css" media="screen" title="no title" charset="utf-8">
-    <script src="../../node_modules/xterm/lib/xterm.js"></script>
+    <script src="../../../node_modules/xterm/lib/xterm.js"></script>
 </head>
 <body>
     <!-- Title Bar -->
     <header id="titlebar">
         <div id="drag-region">
             <div id="window-title">
-                <img src="../../TraaaaBot.iconset/icon_512x512@2x@2x.png" alt="App Icon" width="24" height="24" style="margin-right: 10px;">
                 <span>TraaaaBot Console</span>
             </div>
             <div id="window-controls">
@@ -50,10 +49,7 @@
 
     <!-- Section One -->
     <div id="section-one">
-        <img src="../../TraaaaBot.iconset/icon_512x512@2x@2x.png" alt="App Icon" width="100" height="100">
-        <h1>TraaaaBot</h1>
-        <p>Before getting started, click Settings to view the settings for the bot and check if everything is correct.</p>
-        <p>To begin, click the Start button below or type <code style="font-family: monospace; background-color: #373737;">start</code> in the console.</p>
+        <img src="../../../TraaaaBot.iconset/icon_512x512@2x@2x.png" alt="App Icon" width="100" height="100">
         <div id="button-container">
             <button class="waves-effect waves-light btn snackbar" data-pos="top-right" id="startBotButton">Start</button>
             <button class="waves-effect waves-light btn snackbar" data-pos="top-right" id="stopBotButton" disabled>Stop</button>
@@ -93,6 +89,28 @@
             <div class="dialog-buttons">
                 <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="stop-yes-button">Yes</button>
                 <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="stop-no-button">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Dialog -->
+    <div id="offline-dialog" class="dialog">
+        <div class="dialog-content">
+            <h2>Offline</h2>
+            <p>You do not seem to be connected to the internet. TraaaaBot Console is now running in offline mode.</p>
+            <div class="dialog-buttons">
+                <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="offline-ok-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Crashed Dialog -->
+    <div id="bot-crash-dialog" class="dialog">
+        <div class="dialog-content">
+            <h2>Bot Crashed</h2>
+            <p>The bot appears to have crashed and is no longer online on Discord. Check the console for more information.</p>
+            <div class="dialog-buttons">
+                <button class="startBotButton waves-effect waves-light btn snackbar" data-pos="top-right" id="offline-ok-button">OK</button>
             </div>
         </div>
     </div>

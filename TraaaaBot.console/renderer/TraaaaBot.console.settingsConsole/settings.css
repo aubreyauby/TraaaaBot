@@ -1,0 +1,182 @@
+html, body {
+    font-family: "Roboto", sans-serif;
+    background-color: #141414;
+    color: white;
+    user-select: none;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar {
+    background-color: #333;
+    color: #fff;
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu li {
+    padding: 0;
+}
+
+.hammer-icon {
+    font-size: 16px;
+}
+
+
+.menu li a .hammer-icon {
+    font-size: 20px;
+}
+
+
+.menu li a i.material-icons.gear-icon {
+    font-size: 20px;
+}
+
+#token[disabled] {
+    color: #707070 !important;
+    user-select: none;
+}
+
+.menu li a.active {
+    background-color: #555;
+
+    color: #fff;
+
+}
+
+.content {
+    width: calc(100% - 220px);
+    margin-left: 200px;
+    margin-right: 0;
+    padding: 15px 20px;
+    box-sizing: border-box;
+}
+
+.menu li a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    margin-bottom: 2px;
+}
+
+.sidebar-header {
+    background-color: #333;
+    color: #777;
+    padding: 10px;
+    text-align: left;
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    margin-top: 0px;
+}
+
+#token {
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    height: 30px;
+    width: 100%;
+    max-width: 100%;
+    padding-left: 8px;
+}
+
+label[for="token"],
+label[for="hardware-acceleration"],
+label[for="generate-logs-on-every-session"] {
+    color: #595959;
+    text-transform: uppercase;
+    font-size: 12px;
+    text-align: left;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.setting .info {
+    color: #595959;
+    font-size: 13px;
+}
+
+.menu li a .icon-container {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #007AFF;
+    border-radius: 5px;
+    margin-right: 10px;
+    display: inline-flex;
+}
+
+.menu li a .icon-container.gear-icon-container {
+    background-color: #007AFF;
+}
+
+.menu li a .icon-container.puzzle-icon-container {
+    background-color: #d67d00;
+}
+
+.menu li a .icon-container.hammer-icon-container {
+    background-color: #FF2D55;
+}
+
+#advanced,
+#extensions {
+    padding: 20px;
+}
+
+
+.setting {
+    margin: 10px 0;
+}
+
+
+.setting input[type="text"],
+.setting input[type="checkbox"] {
+    width: 100%;
+    max-width: 300px;
+}
+
+#rich-presence-selection {
+    border: 2px solid #595959;
+    background-color: transparent;
+    color: white;
+    padding: 5px 25px 5px 8px;
+    border-radius: 4px;
+    width: 400px;
+    margin-top: 10px;
+    position: relative;
+}
+
+
+#rich-presence-selection::after {
+    content: '\25BC';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: white;
+}
+
+
+#rich-presence-selection option {
+    background-color: transparent;
+    color: white;
+}

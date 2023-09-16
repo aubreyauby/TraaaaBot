@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="settings.css" charset="utf-8">
+    <link rel="stylesheet" href="iOS.css" charset="utf-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>TraaaaBot Discord Bot Settings</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            TraaaaBot Discord Bot
+            Version 1.0.0
+        </div>
+        <ul class="menu">
+            <li>
+                <a href="#general" class="active">
+                    <span class="icon-container gear-icon-container"><i
+                            class="material-icons gear-icon">settings</i></span>
+                    General
+                </a>
+            </li>
+            <li>
+                <a href="#extensions">
+                    <span class="icon-container puzzle-icon-container"><i
+                            class="material-icons puzzle-icon">extension</i></span>
+                    Extensions
+                </a>
+            </li>
+            <li>
+                <a href="#advanced">
+                    <span class="icon-container hammer-icon-container"><i
+                            class="material-icons hammer-icon">build</i></span>
+                    Advanced
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <!-- General -->
+        <div id="general" class="tab-content">
+            <!-- Content for the General tab goes here -->
+        </div>
+
+        <!-- Extensions -->
+        <div id="extensions" class="tab-content">
+            <div class="setting">
+                <label for="token">DISCORD RICH PRESENCE</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="discord-rich-presence" name="discord-rich-presence">
+                    <label class="slider-ios" for="discord-rich-presence"></label>
+                </div>
+                <select id="rich-presence-selection" name="fruits" disabled>
+                    <option value="apple">Standard</option>
+                    <option value="banana">Transfem Edition</option>
+                    <option value="cherry">Transmasc Edition</option>
+                </select>
+                <p class="info">
+                    Rich Presence in TraaaaBot Console enhances your Discord status by showing what you're doing, like
+                    your current task or bot status, giving others insight into your activity.
+                </p>
+            </div>
+            <div class="setting">
+                <label for="token">MONGODB</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="mongodb" name="mongodb" checked>
+                    <label class="slider-ios" for="mongodb"></label>
+                </div>
+                <p class="info">
+                    Many commands use MongoDB to store data into an online database. Commands such as strike and rank
+                    utilize the database to store data about users in guilds for their respective purpose. Keep this
+                    enabled so that these plugins would be able to function properly. If you disable this, commands may
+                    be disabled globally due to the bot's lack of access to the database.
+                </p>
+            </div>
+            <div class="setting">
+                <label for="token">LAVALINK</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="lavalink" name="lavalink" checked>
+                    <label class="slider-ios" for="lavalink"></label>
+                </div>
+                <p class="info">
+                    Lavalink is a vital component that empowers TraaaaBot with high-quality music streaming and audio
+                    playback capabilities. Enable Lavalink to enhance TraaaaBot's audio experience and provide users
+                    with music entertainment in voice channels. Disabling this would completely disable all commands
+                    under the media category.
+                </p>
+            </div>
+        </div>
+
+        <!-- Advanced  -->
+        <div id="advanced" class="tab-content">
+            <div class="setting">
+                <label for="token">TOKEN</label>
+                <input type="text" id="token" name="token" disabled>
+                <p class="info">This token was retrieved from the bot's DOTENV file. If you need to edit the token, go
+                    back to the console and type <code style="font-family: monospace;">override token-edit</code>.</p>
+            </div>
+
+            <!-- Add the iOS-style hardware acceleration switch setting here -->
+            <div class="setting">
+                <label class="ios-label" for="hardware-acceleration">Hardware Acceleration</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="hardware-acceleration" name="hardware-acceleration" checked>
+                    <label class="slider-ios" for="hardware-acceleration"></label>
+                </div>
+                <p class="info">Allow TraaaaBot to use what is simply just required from your hardware specifications.
+                    Disabling this would mean slower performance, and some features may not be available.</p>
+            </div>
+
+            <div class="setting">
+                <label class="ios-label" for="generate-logs-on-every-session">Generate logs on every session</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="generate-logs-on-every-session" name="generate-logs-on-every-session">
+                    <label class="slider-ios" for="generate-logs-on-every-session"></label>
+                </div>
+                <p class="info">For every time you start the bot, the complete output from the console would be logged
+                    to a text file (.txt) and saved to a specified location so you can see recent bot activity anytime.
+                    This would only log activity from the moment you started the bot to the moment you stopped it.</p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.discordapp.com/developers/app/assets/index.js"></script>
+    <script type="module" src="settings.js" charset="utf-8"></script>
+</body>
+
+</html>

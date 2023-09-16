@@ -1,5 +1,6 @@
 const { devs, testServer } = require('../../../config.json');
 const getLocalCommands = require('../../utils/getLocalCommands');
+const { EmbedBuilder } = require('discord.js');
 const path = require('path');
 
 module.exports = async (client, interaction) => {
@@ -16,32 +17,29 @@ module.exports = async (client, interaction) => {
 
     if (commandObject.devOnly) {
       if (!devs.includes(interaction.member.id)) {
-        interaction.reply({
-          content: 'This command is only available to authorized developers.',
-          ephemeral: true,
-        });
-        return;
+        const noPermission = new EmbedBuilder().setColor(0xFF0000)
+        .setTitle(`Error`)
+        .setDescription(`This command is only available for selected members.`)
+        return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
 
     if (commandObject.testOnly) {
       if (!(interaction.guild.id === testServer)) {
-        interaction.reply({
-          content: 'This command is only available in the specified development server.',
-          ephemeral: true,
-        });
-        return;
+        const noPermission = new EmbedBuilder().setColor(0xFF0000)
+        .setTitle(`Error`)
+        .setDescription(`This command is only available in selected guilds.`)
+        return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
 
     if (commandObject.permissionsRequired?.length) {
       for (const permission of commandObject.permissionsRequired) {
         if (!interaction.member.permissions.has(permission)) {
-          interaction.reply({
-            content: 'You do not have the required permissions to run this command.',
-            ephemeral: true,
-          });
-          return;
+          const noPermission = new EmbedBuilder().setColor(0xFF0000)
+          .setTitle(`Error`)
+          .setDescription(`You do not have permission to use this command.`)
+          return await interaction.reply({ embeds: [noPermission], ephemeral: true });
         }
       }
     }
@@ -51,11 +49,10 @@ module.exports = async (client, interaction) => {
         const bot = interaction.guild.members.me;
 
         if (!bot.permissions.has(permission)) {
-          interaction.reply({
-            content: "I do not have the required permissions to run this command. Please check my permissions and try again.",
-            ephemeral: true,
-          });
-          return;
+          const noPermission = new EmbedBuilder().setColor(0xFF0000)
+          .setTitle(`Error`)
+          .setDescription(`TraaaaBot cannot use this command because it lacks a permission to do so. Try modifying the permissions for the bot and try again later.`)
+          return await interaction.reply({ embeds: [noPermission], ephemeral: true });
         }
       }
     }

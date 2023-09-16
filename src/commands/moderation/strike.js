@@ -1,11 +1,7 @@
 const { Client, 
   Interaction, 
-  ModalBuilder, 
-  TextInputBuilder,
-  TextInputStyle,
   PermissionFlagsBits,
   EmbedBuilder,
-  PermissionsBitField,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -22,14 +18,6 @@ module.exports = {
    * @param {Interaction} interaction
    */
   callback: async (client, interaction) => {
-      // Prohibit members without the manage messages permission from using this command.
-      if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-        const noPermission = new EmbedBuilder().setColor(0xFF0000)
-        .setTitle(`Error`)
-        .setDescription(`You do not have permission to use this command.`)
-        return await interaction.reply({ embeds: [noPermission], ephemeral: true });
-      }
-
       // Prohibit moderators from trying to strike the bot itself.
       const mentionedUser = interaction.options.getUser('user');
       if (mentionedUser.id === client.user.id) {
@@ -122,37 +110,30 @@ module.exports = {
             attachmentCollector.on('collect', async (msg) => {
               const attachment = msg.attachments.first();
 
-              const submissionConfirmationEmbed = new EmbedBuilder()
-                .setColor(0xA3A3A3)
+              const submissionConfirmationEmbed = new EmbedBuilder().setColor(0xA3A3A3)
                 .setTitle(`Submission Received`)
                 .setDescription(`We have received your submission(s) for ${interaction.options.getUser('user').username}'s strike. \n\nPlease wait while we process your attachments and prepare a confirmation...`)
                 .setThumbnail(interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
 
-              await interaction.editReply({
-                embeds: [submissionConfirmationEmbed],
-                components: []
-              });
+              await interaction.editReply({ embeds: [submissionConfirmationEmbed], components: [] });
 
-              const attachmentBuffer = await fetch(attachment.url).then((response) =>
-                response.arrayBuffer()
-              );
+              const attachmentBuffer = await fetch(attachment.url).then((response) => response.arrayBuffer() );
             
               const attachmentPath = '../../strikersc/';
               const fileName = `${attachmentPath}${attachment.name}`;
             
-              if (!fs.existsSync(attachmentPath)) {
-                fs.mkdirSync(attachmentPath, { recursive: true });
-              }
+              if (!fs.existsSync(attachmentPath)) { fs.mkdirSync(attachmentPath, { recursive: true }); }
             
               fs.writeFileSync(fileName, Buffer.from(attachmentBuffer));
-            
-              if (attachment.contentType.startsWith('image')) {
+
+              const acceptedExtensions = ['png', 'jpeg', 'jpg', 'gif'];
+              const fileExtension = attachment.name.split('.').pop().toLowerCase();
+              if (acceptedExtensions.includes(fileExtension)) {
                   try {
                     const { options, guildId } = interaction;
                     const target = options.getUser('user');
 
-                    const whatRuleWasViolatedValue = interaction.fields.getTextInputValue('whatRuleWasViolated');
-                    const strikeDetailsValue = interaction.fields.getTextInputValue('strikeDetails');
+                    const reason = interaction.options.getString('reason') || "No reason provided";
 
                     try {
                       data = await strikeSchema.findOne({
@@ -179,8 +160,7 @@ module.exports = {
                       .addFields(
                         { name: 'Strike', value: `**${strikeCount}**`, inline: true },
                         { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                        { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                        { name: 'Explanation', value: strikeDetailsValue, inline: false }
+                        { name: 'Reason', value: reason, inline: false }
                       ); 
 
                       interaction.editReply({embeds: [imageEmbed], files: [fileName], components: [row]}); 
@@ -192,15 +172,12 @@ module.exports = {
                             const target = options.getUser('user');
                             const userTag = `${target.username}`;
                             
-                            // Get the user's input values
-                            const whatRuleWasViolatedValue = interaction.fields.getTextInputValue('whatRuleWasViolated');
-                            const strikeDetailsValue = interaction.fields.getTextInputValue('strikeDetails');
+                            const reason = interaction.options.getString('reason') || "No reason provided";
                       
                             const strikeContent = {
                               ExecutorID: user.id,
                               ExecutorTag: user.tag,
-                              RuleBroken: whatRuleWasViolatedValue || 'No rule mentioned',
-                              StrikeDetails: strikeDetailsValue,
+                              Reason: reason || "No reason provided",
                             };
                             
                             let data = await strikeSchema.findOne({
@@ -237,8 +214,7 @@ module.exports = {
                             .addFields(
                                 { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                                 { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                                { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                                { name: 'Explanation', value: strikeDetailsValue, inline: false }
+                                { name: 'Reason', value: reason, inline: false }
                             )
                   
                             let sentDMConfirmation = "";
@@ -258,8 +234,7 @@ module.exports = {
                               .addFields(
                                   { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                                   { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                                  { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                                  { name: 'Explanation', value: strikeDetailsValue, inline: false },
+                                  { name: 'Reason', value: reason, inline: false },
                                   { name: 'Delivered to DM?', value: sentDMConfirmation, inline: false },
                               );
 
@@ -302,8 +277,7 @@ module.exports = {
                         .addFields(
                           { name: 'Strike', value: `\`${error.message}\``, inline: false },
                           { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                          { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                          { name: 'Explanation', value: strikeDetailsValue, inline: false }
+                          { name: 'Reason', value: reason, inline: false }
                         );
                         
                         interaction.editReply({embeds: [dbimageEmbed], files: [fileName], components: [dbrow]});
@@ -314,16 +288,11 @@ module.exports = {
                             const { options, guildId, user } = interaction;
                             const target = options.getUser('user');
                             const userTag = `${target.username}`;
-                            
-                            // Get the user's input values
-                            const whatRuleWasViolatedValue = interaction.fields.getTextInputValue('whatRuleWasViolated');
-                            const strikeDetailsValue = interaction.fields.getTextInputValue('strikeDetails');
                       
                             const strikeContent = {
                               ExecutorID: user.id,
                               ExecutorTag: user.tag,
-                              RuleBroken: whatRuleWasViolatedValue || 'No rule mentioned',
-                              StrikeDetails: strikeDetailsValue,
+                              Reason: reason || "No reason provided",
                             };
                             
                             let data = await strikeSchema.findOne({
@@ -417,7 +386,7 @@ module.exports = {
               } else {
                 const invalidAttachmentEmbed = new EmbedBuilder().setColor(0xFF0000)
                   .setTitle(`Invalid Attachment`)
-                  .setDescription(`The attachment you provided (\`${attachment.name}\`) is not a valid attachment. Please submit images or GIFs and try again.`)
+                  .setDescription(`The attachment you provided (\`${attachment.name}\`) is not a valid attachment. Please submit images or GIFs and try again.\n\nAccepted formats:\n\`.png\`, \`.jpg\`, \`.jpeg\`, \`.gif\``)
                   .setThumbnail(interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
         
                 const invalidAttachmentRow = new ActionRowBuilder().addComponents(forgetAboutIt);
@@ -428,7 +397,7 @@ module.exports = {
               msg.delete().catch(console.error);
             });
         
-            attachmentCollector.on('end', async (collected, reason) => {
+            attachmentCollector.on('end', async (collected) => {
               if (collected.size === 0) {
                 // Handle the case when no attachments are submitted within the specified time...
               }
@@ -438,16 +407,12 @@ module.exports = {
             const { options, guildId, user } = interaction;
             const target = options.getUser('user');
             const userTag = `${target.username}`;
-            
-            // Get the user's input values
-            const whatRuleWasViolatedValue = interaction.fields.getTextInputValue('whatRuleWasViolated');
-            const strikeDetailsValue = interaction.fields.getTextInputValue('strikeDetails');
-      
+            const reason = interaction.options.getString('reason') || "No reason provided";
+
             const strikeContent = {
               ExecutorID: user.id,
               ExecutorTag: user.tag,
-              RuleBroken: whatRuleWasViolatedValue || 'No rule mentioned',
-              StrikeDetails: strikeDetailsValue,
+              Reason: reason || "No reason provided",
             };
             
             let data = await strikeSchema.findOne({
@@ -483,8 +448,7 @@ module.exports = {
             .addFields(
                 { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                 { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                { name: 'Explanation', value: strikeDetailsValue, inline: false }
+                { name: 'Reason', value: reason, inline: false }
             )
   
             let sentDMConfirmation = "";
@@ -503,8 +467,7 @@ module.exports = {
               .addFields(
                   { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                   { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                  { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                  { name: 'Explanation', value: strikeDetailsValue, inline: false },
+                  { name: 'Reason', value: reason || "No reason provided", inline: false },
                   { name: 'Delivered to DM?', value: sentDMConfirmation, inline: false },
               );
 
@@ -536,8 +499,8 @@ module.exports = {
   },
 
   name: 'strike',
-  description: "Issues a strike to the user.",
-  options : [
+  description: "Issue a moderation strike to a member.",
+  options: [
       {
           name: "user",
           description: "The user to strike.",
@@ -545,16 +508,10 @@ module.exports = {
           required: true
       },
       {
-        name: "ruleViolated",
-        description: "Specify what server rule was violated. Not required.",
-        type: ApplicationCommandOptionType.String,
-        required: false
-      },
-      {
-        name: "description",
-        description: "Describe how the rule was violated. Required.",
-        type: ApplicationCommandOptionType.String,
-        required: true
+          name: "reason",
+          description: "The reason for striking the user.",
+          type: ApplicationCommandOptionType.String,
+          required: false
       }
   ],
   permissionsRequired: [PermissionFlagsBits.ManageMessages],

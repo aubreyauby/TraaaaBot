@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="settings.css" charset="utf-8">
+    <link rel="stylesheet" href="iOS.css" charset="utf-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>TraaaaBot Console Settings</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            TraaaaBot Console
+            alpha-000001
+        </div>
+        <ul class="menu">
+            <li>
+                <a href="#general" class="active">
+                    <span class="icon-container gear-icon-container"><i
+                            class="material-icons gear-icon">settings</i></span>
+                    General
+                </a>
+            </li>
+            <li>
+                <a href="#extensions">
+                    <span class="icon-container puzzle-icon-container"><i
+                            class="material-icons puzzle-icon">extension</i></span>
+                    Extensions
+                </a>
+            </li>
+            <li>
+                <a href="#advanced">
+                    <span class="icon-container hammer-icon-container"><i
+                            class="material-icons hammer-icon">build</i></span>
+                    Advanced
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <!-- General -->
+        <div id="general" class="tab-content">
+            
+        </div>
+
+        <!-- Extensions -->
+        <div id="extensions" class="tab-content">
+            <div class="setting">
+                <label for="token">DISCORD RICH PRESENCE</label>
+                <div class="ios-switch">
+                    <input type="checkbox" id="discord-rich-presence" name="discord-rich-presence">
+                    <label class="slider-ios" for="discord-rich-presence"></label>
+                </div>
+                <select id="rich-presence-selection" name="fruits" disabled>
+                    <option value="apple">Standard</option>
+                    <option value="banana">Transfem Edition</option>
+                    <option value="cherry">Transmasc Edition</option>
+                </select>
+                <p class="info">
+                    Rich Presence in TraaaaBot Console enhances your Discord status by showing what you're doing, like
+                    your current task or bot status, giving others insight into your activity.
+                </p>
+            </div>
+        </div>
+
+        <!-- Advanced  -->
+        <div id="advanced" class="tab-content">
+
+        </div>
+    </div>
+    <script src="https://cdn.discordapp.com/developers/app/assets/index.js"></script>
+    <script type="module" src="settings.js" charset="utf-8"></script>
+</body>
+
+</html>

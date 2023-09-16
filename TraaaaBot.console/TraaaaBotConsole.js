@@ -2,10 +2,29 @@ const path = require('path');
 const url = require('url');
 const { app: traaaabotConsole, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const axios = require('axios');
-const applicationMenu = require('./menu.js');
+const customizeMenu = require('./menu.js');
+const DiscordRPC = require('discord-rpc');
+DiscordRPC.register('1152028710816448522'); // Replace with your Discord application's Client ID
+
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+rpc.login({ clientId: '1152028710816448522' }).catch(console.error);
+
+function setRichPresence(enabled) {
+  if (enabled) {
+    rpc.setActivity({
+      details: 'Eating Progesterone',
+      state: 'and Estrogen',
+      largeImageKey: 'estrogen',
+      largeImageText: 'estrog',
+    });
+  } else {
+    rpc.clearActivity();
+  }
+}
 
 let mainWindow;
 let isCancelClicked = false;
+let settingsWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -25,16 +44,19 @@ function createWindow() {
 
   // For developmental purposes, toggle false if you don't want to show Dev Tools.
   // If otherwise, set to true.
-  let showDev = true;
+  let showDev = false;
   if (showDev) { mainWindow.webContents.openDevTools(); }
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, 'renderer/index.html'),
+      pathname: path.join(__dirname, 'renderer/TraaaaBot.console.main/index.html'),
       protocol: 'file:',
       slashes: true,
     })
   );
+
+  // Enable Discord Rich Presence when the main window is created
+  setRichPresence(true);
 
   let isClosing = false;
 
@@ -90,9 +112,7 @@ function createWindow() {
 
 traaaabotConsole.on('ready', () => {
   createWindow();
-
-  const appMenu = Menu.buildFromTemplate(applicationMenu);
-  Menu.setApplicationMenu(appMenu);
+  customizeMenu();
 
   ipcMain.on('close-app', () => {
     app.quit();
@@ -100,6 +120,10 @@ traaaabotConsole.on('ready', () => {
 
   ipcMain.on('start-bot', () => {
     startBot();
+  });
+
+  ipcMain.on('open-settings-window', () => {
+    createSettingsWindow();
   });
 });
 
@@ -144,3 +168,32 @@ ipcMain.on('close-window', () => {
 ipcMain.on('get-window-state', (event) => {
   event.sender.send('window-state', mainWindow.isMaximized());
 });
+
+function createSettingsWindow() {
+  if (!settingsWindow) {
+    settingsWindow = new BrowserWindow({
+      width: 800,
+      minWidth: 800,
+      height: 600,
+      minHeight: 600,
+      fullscreenable: false,
+      minimizable: false,
+      webPreferences: {
+        nodeIntegration: true,
+      },
+    });
+
+    settingsWindow.webContents.openDevTools();
+    
+    settingsWindow.on('closed', () => {
+      settingsWindow = null;
+    });
+
+    // Load the settings.html file
+    settingsWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'renderer/TraaaaBot.console.settings/settings.html'),
+      protocol: 'file:',
+      slashes: true,
+    }));
+  }
+}

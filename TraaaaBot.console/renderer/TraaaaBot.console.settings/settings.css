@@ -1,0 +1,185 @@
+/* settings.css */
+
+html, body {
+  font-family: "Roboto", sans-serif;
+  background-color: #141414;
+  color: white;
+  user-select: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar {
+  background-color: #333;
+  color: #fff;
+  width: 200px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+}
+
+.menu li {
+  padding: 0;
+}
+
+.hammer-icon {
+  font-size: 16px; /* Adjust the size as needed */
+}
+
+/* Make the advanced icon larger */
+.menu li a .hammer-icon {
+  font-size: 20px;
+}
+
+/* Adjust the margin for the gear icon for "General" menu item */
+.menu li a i.material-icons.gear-icon {
+  font-size: 20px;
+}
+
+#token[disabled] {
+  color: #707070 !important;
+  user-select: none;
+}
+
+.menu li a.active {
+  background-color: #555;
+  /* Add a background color to indicate selection */
+  color: #fff;
+  /* Text color for the active menu item */
+}
+
+.content {
+  width: calc(100% - 220px); /* Subtract sidebar width from total width */
+  margin-left: 200px; /* Width of the sidebar */
+  margin-right: 0; /* Remove the right margin */
+  padding: 15px 20px; /* Adjust the padding */
+  box-sizing: border-box; /* Include padding in the total width */
+}
+
+.menu li a {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
+  margin-bottom: 2px; /* Adjust this value to move the menu items closer to the sidebar header */
+}
+
+.sidebar-header {
+  background-color: #333;
+  color: #777;
+  padding: 10px;
+  text-align: left;
+  font-size: 11px;
+  /* Smaller font size */
+  text-transform: uppercase;
+  /* Text in all caps */
+  margin-top: 0px; /* Adjust this value to move the header closer to the menu items */
+}
+
+#token {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  height: 30px;
+  width: 100%; /* Make the textbox take the full width of its container */
+  max-width: 100%; /* Ensure it doesn't exceed the full width */
+  padding-left: 8px; /* Add left padding to space out text */
+}
+
+label[for="token"],
+label[for="hardware-acceleration"],
+label[for="generate-logs-on-every-session"] {
+  color: #595959;
+  text-transform: uppercase;
+  font-size: 12px;
+  text-align: left;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.setting .info {
+  color: #595959; /* Same color as the token label */
+  font-size: 13px; /* Smaller font size */
+}
+
+.menu li a .icon-container {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #007AFF;
+  border-radius: 5px;
+  margin-right: 10px;
+  display: inline-flex; /* Add this property */
+}
+
+.menu li a .icon-container.gear-icon-container {
+  background-color: #007AFF; /* Background color for the gear icon container */
+}
+
+.menu li a .icon-container.puzzle-icon-container {
+  background-color: #d67d00; /* Background color for the puzzle icon container */
+}
+
+.menu li a .icon-container.hammer-icon-container {
+  background-color: #FF2D55; /* Background color for the hammer icon container */
+}
+
+#advanced,
+#extensions {
+  padding: 20px; /* Add or adjust padding as needed */
+}
+
+/* Style for the items inside the advanced tab */
+.setting {
+  margin: 10px 0;
+}
+
+/* Adjust the width of the input field */
+.setting input[type="text"],
+.setting input[type="checkbox"] {
+  width: 100%; /* Make input fields take the full width */
+  max-width: 300px; /* Adjust the maximum width as needed */
+}
+
+/* Style the select element */
+#rich-presence-selection {
+  border: 2px solid #595959; /* Same color as the labels */
+  background-color: transparent; /* Transparent background */
+  color: white; /* White text color */
+  padding: 5px 25px 5px 8px; /* 5px top and bottom padding, 8px left padding, 25px right padding */
+  border-radius: 4px; /* Add border radius for rounded corners */
+  width: 400px; /* Set a width for the select element */
+  margin-top: 10px; /* Move the select element down by 10px */
+  position: relative; /* Add relative positioning for absolute child elements */
+}
+
+/* Style the dropdown arrow */
+#rich-presence-selection::after {
+  content: '\25BC'; /* Unicode for a down arrow character */
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Adjust the right distance from the select box */
+  transform: translateY(-50%);
+  color: white; /* White arrow color */
+}
+
+/* Style the options */
+#rich-presence-selection option {
+  background-color: transparent; /* Transparent background for options */
+  color: white; /* White text color for options */
+}

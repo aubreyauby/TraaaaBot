@@ -1,6 +1,5 @@
 const { Client, 
     Interaction, 
-    EmbedBuilder,
     ButtonBuilder,
     ButtonStyle,
     ActionRowBuilder,
@@ -64,11 +63,6 @@ module.exports = {
 
         collector.on('collect', async (i) => {
             if (i.customId === 'cstrconfirm') {
-                let data = await strikeSchema.findOneAndDelete({
-                    guildID: guildId,
-                    userID: target.id,
-                    userTag: target.tag
-                });
 
                 const resultEmbed = {
                     color: 0x5cb85c,

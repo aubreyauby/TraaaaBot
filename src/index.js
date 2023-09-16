@@ -20,13 +20,16 @@ const client = new Client({
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildVoiceStates,
   ],
 });
 
+client.queue = new Map();
+
 const transFlagColors = [
-  '\x1b[38;2;91;172;247m',  // Blue
-  '\x1b[38;2;242;100;157m', // Pink
-  '\x1b[38;2;255;255;255m', // White
+  '\x1b[38;2;91;172;247m',
+  '\x1b[38;2;242;100;157m',
+  '\x1b[38;2;255;255;255m',
 ];
 
 // Create the trans flag ASCII art with color-coded rows
@@ -42,7 +45,7 @@ console.log(transFlagArt.join('\n'));
 
 // Display the version number and the name of the bot.
 const transFlagBlue = '\x1b[38;2;91;172;247m';
-console.log(`\n${transFlagBlue}\x1b[1mWelcome to TraaaaBot! Version: ${process.env.VERSION}\x1b[0m\n`);
+console.log(`\n${transFlagBlue}\x1b[1mWelcome to TraaaaBot! A multi-purpose Discord bot written by electrasys in JavaScript.\n`);
 
 // Display where the development workspace is located. In this case, it will show the ID of the test server,
 // user ID of the bot, and the guild ID of the test server.
