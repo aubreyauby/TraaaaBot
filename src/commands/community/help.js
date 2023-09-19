@@ -54,18 +54,13 @@ module.exports = {
         const welcomeEmbed = new EmbedBuilder()
         .setTitle('Welcome to TraaaaBot!')
         .setAuthor({ name: 'TraaaaBot', iconURL: client.user.displayAvatarURL() })
-        .setDescription(`Please select a category from the dropdown menu below to see the list of commands. 
-        
-        Alternatively, if you want to see all the commands in one page, click [here](https://www.google.com/) to view the full documentation.
-        
-        Are you looking for the dashboard? Click [here](https://www.google.com/) to login and access the dashboard.
-        
-        All commands work with either the set prefix or Discord's slash commands.`)
+        .setDescription(`Please select a category from the dropdown menu below to see the list of commands.\n\nAlternatively, if you want to see all the commands in one page, click [here](https://www.google.com/) to view the full documentation.\n\nAre you looking for the dashboard? Click [here](https://www.google.com/) to login and access the dashboard.\n\nAll commands work with either the set prefix or Discord's slash commands.`)
         .setColor(0x3498db);
 
         const selectOptions = [
             { label: 'Community', description: 'General commands available to all members of the server.', value: 'community', emoji: '👥' || null },
             { label: 'Economy', description: 'Economic features like ranks and TraaaaBot coins.', value: 'economy', emoji: '💰' || null },
+            { label: 'Media', description: 'Commands that utilize images sent by users and in voice channels.', value: 'media', emoji: '🎤' || null },
             { label: 'Moderation', description: 'Commands ideal for server moderation.', value: 'moderation', emoji: '🛠️' || null },
             { label: 'Utilities', description: 'Server and bot management commands.', value: 'utilities', emoji: '⚙️' || null }
         ];

@@ -13,7 +13,7 @@ module.exports = {
       const notInVCEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle("Error")
-        .setDescription(`Please join a voice channel to use this command.`);
+        .setDescription(`:x: Please join a voice channel to use this command.`);
 
       return interaction.reply({ embeds: [notInVCEmbed] });
     }
@@ -25,7 +25,7 @@ module.exports = {
       const notInVoiceEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle("Error")
-        .setDescription(`I am not in a voice channel.`);
+        .setDescription(`:x: I am not in a voice channel.`);
 
       return interaction.reply({ embeds: [notInVoiceEmbed] });
     }
@@ -35,7 +35,7 @@ module.exports = {
     const successEmbed = new EmbedBuilder()
       .setColor(0x00ff00)
       .setTitle("Success")
-      .setDescription(`Left voice channel: **${channel.name}**`);
+      .setDescription(`:white_check_mark: Left voice channel: **${channel.name}**`);
 
     return interaction.reply({ embeds: [successEmbed] });
   },

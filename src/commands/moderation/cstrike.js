@@ -4,6 +4,7 @@ const { Client,
     ButtonStyle,
     ActionRowBuilder,
     PermissionsBitField,
+    PermissionFlagsBits,
     ApplicationCommandOptionType } = require('discord.js');
 const strikeSchema = require('../../models/strike');
 module.exports = {
@@ -63,6 +64,11 @@ module.exports = {
 
         collector.on('collect', async (i) => {
             if (i.customId === 'cstrconfirm') {
+                await strikeSchema.findOneAndDelete({
+                    guildID: guildId,
+                    userID: target.id,
+                    userTag: target.tag
+                });
 
                 const resultEmbed = {
                     color: 0x5cb85c,
@@ -73,7 +79,9 @@ module.exports = {
                     }
                 };
 
+
                 interaction.editReply({ embeds: [resultEmbed], components: [] });
+                collector.stop();
                 buttonResponseProvided = true;
             } else if (i.customId === 'cstrcancel') {
                 const cancelEmbed = {
@@ -84,8 +92,8 @@ module.exports = {
                         url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                     }
                 };
-
                 interaction.editReply({ embeds: [cancelEmbed], components: [] });
+                collector.stop();
                 buttonResponseProvided = true;
             }
         });
@@ -115,5 +123,7 @@ module.exports = {
             type: ApplicationCommandOptionType.Mentionable,
             required: true
         }
-    ]
+    ],
+    permissionsRequired: [PermissionFlagsBits.ManageMessages],
+    botPermissions: [PermissionFlagsBits.ManageMessages]
 }

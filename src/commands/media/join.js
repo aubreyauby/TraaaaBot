@@ -13,7 +13,7 @@ module.exports = {
       const notInVCEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle("Error")
-        .setDescription(`Please join a voice channel to use this command.`);
+        .setDescription(`:x: Please join a voice channel to use this command.`);
 
       return interaction.reply({ embeds: [notInVCEmbed] });
     }
@@ -26,7 +26,7 @@ module.exports = {
       const alreadyInVoiceEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle("Error")
-        .setDescription(`I'm already in a voice channel: **${botChannelName}**`);
+        .setDescription(`:x: I'm already in a voice channel: **${botChannelName}**`);
 
       return interaction.reply({ embeds: [alreadyInVoiceEmbed] });
     }
@@ -36,7 +36,7 @@ module.exports = {
       const missingPermissionsEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle("Error")
-        .setDescription(`I don't have the necessary permissions to join this voice channel. Missing permissions: \`${noConnectPerm.toArray().join(", ")}\``);
+        .setDescription(`:x: I don't have the necessary permissions to join this voice channel. Missing permissions: \`${noConnectPerm.toArray().join(", ")}\``);
 
       return interaction.reply({ embeds: [missingPermissionsEmbed] });
     }
@@ -50,7 +50,7 @@ module.exports = {
     const successEmbed = new EmbedBuilder()
       .setColor(0x00ff00)
       .setTitle("Success")
-      .setDescription(`Joined voice channel: **${channel.name !== null ? channel.name : "unknown"}**`);
+      .setDescription(`:white_check_mark: Joined voice channel: **${channel.name !== null ? channel.name : "unknown"}**`);
 
     return interaction.reply({ embeds: [successEmbed] });
   },

@@ -17,8 +17,7 @@
             {
                 ExecutorID: String,
                 ExecutorTag: String,
-                RuleBroken: String,
-                StrikeDetails: String,
+                Reason: String,
             }
         ]
     });

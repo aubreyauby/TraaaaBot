@@ -69,8 +69,8 @@ module.exports = {
     description: "Shows the current rank of a member.",
     options: [
         {
-            name: 'target-user',
-            description: 'The user you will check their levels from.',
+            name: 'user',
+            description: 'The user to check the current rank of.',
             type: ApplicationCommandOptionType.Mentionable,
         }
     ]

@@ -1,75 +1,297 @@
 module.exports = {
     wcrb: {
-      streamUrl: "https://wgbh-live.streamguys1.com/classical-hi?uuid=jo37cazfr",
-      stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/bb08cc6/2147483647/strip/true/crop/1281x855+0+0/resize/180x120!/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Flegacy%2Fsites%2Fwcrb%2Ffiles%2F202009%2FCRB_Classical995_rgb_white.png",
+        streamUrl: "https://wgbh-live.streamguys1.com/classical-hi?uuid=jo37cazfr",
+        stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/bb08cc6/2147483647/strip/true/crop/1281x855+0+0/resize/180x120!/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Flegacy%2Fsites%2Fwcrb%2Ffiles%2F202009%2FCRB_Classical995_rgb_white.png",
+        countryCode: "US",
+        ownerName: "WGBH Educational Foundation",
     },
     wucf: {
-      streamUrl: "https://peridot.streamguys1.com:7835/WUCF",
-      stationIconUrl: "https://images.squarespace-cdn.com/content/v1/55df6138e4b0cc963b8f6f56/1659611015648-NLMQ7KO9028VIH1B5IRN/WUCF-generic-white.png",
+        streamUrl: "https://peridot.streamguys1.com:7835/WUCF",
+        stationIconUrl: "https://images.squarespace-cdn.com/content/v1/55df6138e4b0cc963b8f6f56/1659611015648-NLMQ7KO9028VIH1B5IRN/WUCF-generic-white.png",
+        countryCode: "US",
+        ownerName: "University of Central Florida",
     },
     wgbh: {
-      streamUrl: "https://wgbh-live.streamguys1.com/wgbh",
-      stationIconUrl: "https://image.pbs.org/stations/wgbh-white-single-brand-logo-gX4UnNN.png?resize=400x200&format=png",
+        streamUrl: "https://wgbh-live.streamguys1.com/wgbh",
+        stationIconUrl: "https://image.pbs.org/stations/wgbh-white-single-brand-logo-gX4UnNN.png?resize=400x200&format=png",
+        countryCode: "US",
+        ownerName: "WGBH Educational Foundation",
     },
     wcai: {
-      streamUrl: "https://wgbh-live.streamguys1.com/wcai?uuid=m64ipu4tp",
-      stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/beeb54a/2147483647/strip/true/crop/456x236+0+0/resize/464x240!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fa6%2Ffb%2F97f9ae064c1abbdc457e80006763%2Fcai-logo-2020-01.png",
+        streamUrl: "https://wgbh-live.streamguys1.com/wcai?uuid=m64ipu4tp",
+        stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/beeb54a/2147483647/strip/true/crop/456x236+0+0/resize/464x240!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fa6%2Ffb%2F97f9ae064c1abbdc457e80006763%2Fcai-logo-2020-01.png",
+        countryCode: "US",
+        ownerName: "WGBH Educational Foundation",
     },
     wbz: {
-      streamUrl: "https://stream.revma.ihrhls.com/zc7729/hls.m3u8?streamid=7729&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7652891546&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7652891546&stationid=7729&terminalId=159&territory=US",
-      stationIconUrl: "https://i.iheart.com/v3/re/assets.brands/622f5c57b4c3b4cfaf1dc640",
+        streamUrl: "https://stream.revma.ihrhls.com/zc7729/hls.m3u8?streamid=7729&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7652891546&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7652891546&stationid=7729&terminalId=159&territory=US",
+        stationIconUrl: "https://i.iheart.com/v3/re/assets.brands/622f5c57b4c3b4cfaf1dc640",
+        countryCode: "US",
+        ownerName: "iHeartMedia",
     },
     wlyf: {
         streamUrl: "https://live.amperwave.net/manifest/audacy-wlyffmaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3",
         stationIconUrl: "https://images.radio.com/aiu-media/logomiami1015litefm-4fd7c8e2-b927-45c8-aaf4-91e3d979dc44.png",
+        countryCode: "US",
+        ownerName: "Audacy, Inc.",
     },
     ckcu: {
         streamUrl: "https://stream2.statsradio.com:8124/stream",
-        stationIconUrl: "https://www.ckcufm.com/wp-content/themes/ckcu/images/CKCUGreen1787.png"
+        stationIconUrl: "https://www.ckcufm.com/wp-content/themes/ckcu/images/CKCUGreen1787.png",
+        countryCode: "CA",
+        ownerName: "Radio Carleton Inc.",
     },
     wmfe: {
         streamUrl: "https://wmfe-iad.streamguys1.com/wmfe?uuid=mb4w980io",
         stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/6076739/2147483647/strip/true/crop/400x178+0+0/resize/880x392!/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Flegacy%2Fwp-content%2Fuploads%2F2019%2F08%2Fwmfe-wmfv-logos_rgb-400x178.png",
+        countryCode: "US",
+        ownerName: "Community Communications, Inc.",
     },
     wpow: {
         streamUrl: "https://live.amperwave.net/manifest/audacy-wpowfmaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3",
-        stationIconUrl: "https://images.radio.com/aiu-media/Power96posrgbfb64cb13c26c45929a7f03e241d64818-ac12a93f-ebdc-4377-8782-db60ebd2f961.png"
+        stationIconUrl: "https://images.radio.com/aiu-media/Power96posrgbfb64cb13c26c45929a7f03e241d64818-ac12a93f-ebdc-4377-8782-db60ebd2f961.png",
+        countryCode: "US",
+        ownerName: "Audacy, Inc.",
     },
     wxxl: {
         streamUrl: "https://stream.revma.ihrhls.com/zc613/hls.m3u8?streamid=613&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7653139857&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7653139857&stationid=613&terminalId=159&territory=US",
-        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/8/87/XL1067logo.png"
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/8/87/XL1067logo.png",
+        countryCode: "US",
+        ownerName: "iHeartMedia",
     },
     wfsu: {
         streamUrl: "https://59018eb29a278.streamlock.net/live/smil:WFSU-FM.smil/playlist.m3u8",
-        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/7/7b/WFSU_Public_Media_logo.png"
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/7/7b/WFSU_Public_Media_logo.png",
+        countryCode: "US",
+        ownerName: "Florida State University",
     },
     wfsq: {
         streamUrl: "https://59018eb29a278.streamlock.net/live/smil:WFSQ-FM.smil/playlist.m3u8",
-        stationIconUrl: "https://cdn-profiles.tunein.com/s28878/images/logog.png?t=151861"
+        stationIconUrl: "https://cdn-profiles.tunein.com/s28878/images/logog.png?t=151861",
+        countryCode: "US",
+        ownerName: "Florida State University",
     },
     wfsw: {
         streamUrl: "https://59018eb29a278.streamlock.net/live/smil:WFSW-FM.smil/playlist.m3u8",
-        stationIconUrl: "https://static.wikia.nocookie.net/logopedia/images/5/5e/WFSW_-_2017x.svg/revision/latest/scale-to-width-down/300?cb=20210304172229"
+        stationIconUrl: "https://static.wikia.nocookie.net/logopedia/images/5/5e/WFSW_-_2017x.svg/revision/latest/scale-to-width-down/300?cb=20210304172229",
+        countryCode: "US",
+        ownerName: "Florida State University",
     },
     wmmo: {
         streamUrl: "https://cmg.streamguys1.com/orl989/orl989-sgplayer-aac?amsparams=playerid%3ASGplayer%3Bskey%3A1694891037239%3B&awparams=playerid%3ASGplayer%3B",
-        stationIconUrl: "https://i.iheart.com/v3/re/assets/images/19275d7c-e59e-4eac-8aa1-fd031c2606db.png"
+        stationIconUrl: "https://i.iheart.com/v3/re/assets/images/19275d7c-e59e-4eac-8aa1-fd031c2606db.png",
+        countryCode: "US",
+        ownerName: "Cox Media Group",
     },
     wocl: {
         streamUrl: "https://live.amperwave.net/manifest/audacy-woclfmaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3",
-        stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5f/WOCL_1059_Sunny_FM_Logo.png"
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5f/WOCL_1059_Sunny_FM_Logo.png",
+        countryCode: "US",
+        ownerName: "Audacy, Inc.",
     },
     wguf: {
         streamUrl: "https://14553.live.streamtheworld.com/WGUF_FMAAC.aac?pname=StandardPlayerV4&pversion=4.19.2-044&dist=triton-web&tdsdk=js-2.9&swm=false&lat=26&long=-80.3&banners=300x250&burst-time=15&sbmid=1a6eefe1-c0f9-423a-9def-30503baad52a",
-        stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/WGUF_98.9Naples%27_FM_talk_logo.jpg/400px-WGUF_98.9Naples%27_FM_talk_logo.jpg"
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/WGUF_98.9Naples%27_FM_talk_logo.jpg/400px-WGUF_98.9Naples%27_FM_talk_logo.jpg",
+        countryCode: "US",
+        ownerName: "Renda Broadcasting",
     },
     wqfb: {
         streamUrl: "http://stream2.ndpusa.com:11012/;",
-        stationIconUrl: "https://www.radio.net/images/broadcasts/57/93/34488/c300.png"
+        stationIconUrl: "https://www.radio.net/images/broadcasts/57/93/34488/c300.png",
+        countryCode: "US",
+        ownerName: "Save the Surf, Inc."
     },
     wmgf: {
         streamUrl: "https://stream.revma.ihrhls.com/zc597/hls.m3u8?streamid=597&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7653519624&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7653519624&stationid=597&terminalId=159&territory=US",
-        stationIconUrl: "https://i.iheart.com/v3/re/assets.brands/63ab5ccc7dcb60ce00b655e9?ops=gravity(%22center%22),contain(180,180)&quality=80"
+        stationIconUrl: "https://i.iheart.com/v3/re/assets.brands/63ab5ccc7dcb60ce00b655e9?ops=gravity(%22center%22),contain(180,180)&quality=80",
+        countryCode: "US",
+        ownerName: "iHeartMedia",
+    },
+    wamr: {
+        streamUrl: "https://live.wostreaming.net/direct/univision-wamrfmaac-imc1?source=webPIPplayer&us_privacy=1YNN",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/2/22/WAMR_amor107.5_logo.png",
+        countryCode: "US",
+        ownerName: "Uforia Audio Network",
+    },
+    whyi: {
+        streamUrl: "https://stream.revma.ihrhls.com/zc561/hls.m3u8?streamid=561&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654382664&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654382664&stationid=561&terminalId=159&territory=US",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/e/e2/WHYI-logo.png",
+        countryCode: "US",
+        ownerName: "iHeartRadio",
+    },
+    kiis: {
+        streamUrl: "https://stream.revma.ihrhls.com/zc185/hls.m3u8?streamid=185&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654392734&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654392734&stationid=185&terminalId=159&territory=US",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/102.7_KIIS_Fm_logo.svg/300px-102.7_KIIS_Fm_logo.svg.png",
+        countryCode: "US",
+        ownerName: "iHeartRadio",
+    },
+    kvvs: {
+        streamUrl: "https://stream.revma.ihrhls.com/zc185/hls.m3u8?streamid=185&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654392734&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654392734&stationid=185&terminalId=159&territory=US",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/102.7_KIIS_Fm_logo.svg/300px-102.7_KIIS_Fm_logo.svg.png",
+        countryCode: "US",
+        ownerName: "iHeartRadio",
+    },
+    wakx: {
+        streamUrl: "https://14833.live.streamtheworld.com/WAKXFMAAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=none&burst-time=15&sbmid=68d1e6b8-9d62-4ef9-8155-dc0fee0875ea",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/2/2d/WAKX-FM_radio_Kix_98-7_logo.png",
+        countryCode: "US",
+        ownerName: "Flagler County Broadcasting",
+    },
+    wnzf: {
+        streamUrl: "https://15123.live.streamtheworld.com/WNZFAMAAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=none&burst-time=15&sbmid=3446c533-ac14-4a00-9bb6-f96e6dcc5372",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/9/9a/WNZF_Newsradio94.9-1550_logo.jpg",
+        countryCode: "US",
+        ownerName: "Flagler County Broadcasting",
+    },
+    wbhq: {
+        streamUrl: "https://17553.live.streamtheworld.com/WBHQFMAAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=none&burst-time=15&sbmid=47ea87a5-a5ff-486c-d85c-af4da1a28d48",
+        stationIconUrl: "https://assets.website-files.com/5a3980dff708a60001764585/5a564587c8be690001980893_5a3a99f380b1bd0001a8a9fe_BEACH927k%20PC-p-500.png",
+        countryCode: "US",
+        ownerName: "Flagler County Broadcasting",
+    },
+    wbhu: {
+        streamUrl: "https://26223.live.streamtheworld.com/WBHUFMAAC.aac?pname=StandardPlayerV4&pversion=4.19.2-044&dist=triton-web&tdsdk=js-2.9&swm=false&banners=300x250&burst-time=15&sbmid=878901e5-d342-4d6d-fd67-6ca3284faef7",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/4/41/WBHU_BEACH105.5_logo.png",
+        countryCode: "US",
+        ownerName: "James Martin (Flagler Broadcasting, LLC)",
+    },
+    waqi: {
+        streamUrl: "https://live.wostreaming.net/direct/univision-waqiamaac-imc1?source=webPIPplayer&us_privacy=1YNN",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/c/c4/WAQI-AM_Radio_Mambi.png",
+        countryCode: "US",
+        ownerName: "Uforia Audio Network",
+    },
+    wqba: {
+        streamUrl: "https://live.wostreaming.net/direct/univision-wqbaamaac-imc1?source=webPIPplayer&us_privacy=1YNN",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/e/e3/WQBA_TUDN_Miami_1140.png",
+        countryCode: "US",
+        ownerName: "Uforia Audio Network",
+    },
+    wkss: {
+        streamUrl: "https://stream.revma.ihrhls.com/zc433/hls.m3u8?streamid=433&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654449225&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654449225&stationid=433&terminalId=159&territory=US",
+        stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/WKSS_logo.png/440px-WKSS_logo.png",
+        countryCode: "US",
+        ownerName: "iHeartMedia",
+    },
+    wkis: {
+        streamUrl: "https://live.amperwave.net/manifest/audacy-wkisfmaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3",
+        stationIconUrl: "https://stg-images.radio.com/aiu-media/RDCStationMigrationLogoWKISFM-cf1ea224-c3f8-43d7-9dfe-8ae379e5f8d7.png?&&&&&&&&&&&&&&&&&&&&&width=200&crop=1:1,offset-y0;",
+        countryCode: "US",
+        ownerName: "Audacy, Inc.",
+    },
+    wkxn: {
+        streamUrl: "https://ice42.securenetsystems.net/WKXN?playSessionID=4ADA1720-6980-4705-991BFD32EC2EFDC6",
+        stationIconUrl: "https://cdnrf.securenetsystems.net/file_radio/stations_large/WKXN/v5/logo.png",
+        countryCode: "US",
+        ownerName: "Autaugaville Radio, Inc.",
+    },
+    wkxk: {
+      streamUrl: "https://ice42.securenetsystems.net/WKXN?playSessionID=4ADA1720-6980-4705-991BFD32EC2EFDC6",
+      stationIconUrl: "https://cdnrf.securenetsystems.net/file_radio/stations_large/WKXN/v5/logo.png",
+      countryCode: "US",
+      ownerName: "Autaugaville Radio, Inc.",
+    },
+    kwnr: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc1345/hls.m3u8?streamid=1345&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654496968&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654496968&stationid=1345&terminalId=159&territory=US",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/c/c9/955theBull.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    kymt: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc1337/hls.m3u8?streamid=1337&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654494489&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654494489&stationid=1337&terminalId=159&territory=US",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/e/ea/KPLV_93.1TheMountain_logo.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    wqam: {
+      streamUrl: "https://live.amperwave.net/manifest/audacy-wqamamaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3&newMeta=true",
+      stationIconUrl: "https://images.radio.com/aiu-media/WQAMFMStationMigrationUnityLogoWMASFM-23bfa480-a37a-4ab1-8fb4-79422402b0fd.png?&&&&&&&&&&&&&&&&&&&&&&&&&&&&width=200&crop=1:1,offset-y0;",
+      countryCode: "US",
+      ownerName: "Audacy, Inc.",
+    },
+    cfra: {
+      streamUrl: "https://26183.live.streamtheworld.com/CFRAAMAAC.aac?dist=bellmedia_iheartradio.ca_web&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=300x250%2C300x600%2C728x90%2C970x250&burst-time=15&sbmid=0537a8af-724d-423a-8e6b-cb0f12ff486a",
+      stationIconUrl: "https://indoorairqualityottawa.ca/wp-content/uploads/2018/08/580-CFRA-Logo.png",
+      countryCode: "CA",
+      ownerName: "Bell Media",
+    },
+    wccp: {
+      streamUrl: "http://s2.radioreformation.com:8060/;stream.mp3",
+      stationIconUrl: "https://cdn-radiotime-logos.tunein.com/s27782q.png",
+      countryCode: "US",
+      ownerName: "John Byrne (Bryne Acquisition Group, LLC)",
+    },
+    wccf: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc5229/hls.m3u8?streamid=5229&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654526574&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654526574&stationid=5229&terminalId=159&territory=US",
+      stationIconUrl: "https://i.iheart.com/v3/re/assets.brands/5d8cd23e730acca81e967c68?ops=gravity(%22center%22),contain(1200,675),quality(65)",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    ksne: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc1341/hls.m3u8?streamid=1341&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7654551490&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7654551490&stationid=1341&terminalId=159&territory=US",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/b/b1/Sunny_106.5.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    kvgs: {
+      streamUrl: "https://14103.live.streamtheworld.com/KVGSFMAACHI.aac?dist=beasleyweb&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=320x50&burst-time=15&sbmid=7bb204ac-a1f9-4403-cc84-a60169f1eadc",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/102.7_KGVS_2022_logo.svg/1200px-102.7_KGVS_2022_logo.svg.png",
+      countryCode: "US",
+      ownerName: "Beasley Broadcast Group",
+    },
+    knpr: {
+      streamUrl: "https://playerservices.streamtheworld.com/api/livestream-redirect/KNPRFMAAC.aac?uuid=mu9tuzi0n",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/7/75/KNPR-FM.png",
+      countryCode: "US",
+      ownerName: "Nevada Public Radio",
+    },
+    cfax: {
+      streamUrl: "https://16643.live.streamtheworld.com/CFAXAMAAC.aac?dist=bellmedia_iheartradio.ca_web&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=300x250%2C300x600%2C728x90%2C970x250&burst-time=15&sbmid=c3bb70f7-e609-475c-de52-759c9ca6cbcf",
+      stationIconUrl: "https://victoria.bigbrothersbigsisters.ca/wp-content/uploads/sites/180/2019/07/CFAX-Logo-600x146.jpg",
+      countryCode: "CA",
+      ownerName: "Bell Media",
+    },
+    wflc: {
+      streamUrl: "https://cmg.streamguys1.com/mia973/mia973-sgplayer-aac?amsparams=playerid%3ASGplayer%3Bskey%3A1694955123420%3B&awparams=playerid%3ASGplayer%3B",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/WFLC_Hits97.3_logo.png/220px-WFLC_Hits97.3_logo.png",
+      countryCode: "US",
+      ownerName: "Cox Media Group",
+    },
+    kcye: {
+      streamUrl: "https://23033.live.streamtheworld.com/KCYEFMAACHI.aac?dist=beasleyweb&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=320x50&burst-time=15&sbmid=72f26ffe-f366-41ac-c602-1be7a036d4a0",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/107.9_KCYE_Coyote_Country_2022_logo.svg/640px-107.9_KCYE_Coyote_Country_2022_logo.svg.png",
+      countryCode: "US",
+      ownerName: "Beasley Broadcast Group",
+    },
+    komp: {
+      streamUrl: "https://14103.live.streamtheworld.com/KOMPFMAAC.aac?dist=tg&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=none&burst-time=15&sbmid=65a80b0c-d363-4c5a-8fb2-4b2fe277fdae",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/1/19/Kompmr7.png",
+      countryCode: "US",
+      ownerName: "Lotus Communications",
+    },
+    kbig: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc173/hls.m3u8?streamid=173&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7656034849&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7656034849&stationid=173&terminalId=159&territory=US",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/9/98/KBIG-FM_2015.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    wrgp: {
+      streamUrl: "https://s2.voscast.com:11835/stream",
+      stationIconUrl: "https://cdn.onlineradiobox.com/img/l/1/31581.v2.png",
+      countryCode: "US",
+      ownerName: "Florida International University",
+    },
+    wlrn: {
+      streamUrl: "https://live.wostreaming.net/direct/wlrnpublicmedia-wlrnfmaac-imc1?source=wlrn_dot_org&uuid=nlwvoseuq",
+      stationIconUrl: "https://cdn-radiotime-logos.tunein.com/s30767g.png",
+      countryCode: "US",
+      ownerName: "Miami-Dade County Public Schools",
+    },
+    kklz: {
+      streamUrl: "https://23113.live.streamtheworld.com/KKLZFMAACHI.aac?dist=beasleyweb&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=320x50&burst-time=15&sbmid=c1cf6851-700b-44ef-c19d-d0b51f327c82",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/96.3_KKLZ_Logo.png/440px-96.3_KKLZ_Logo.png",
+      countryCode: "US",
+      ownerName: "Beasley Broadcast Group",
     }
   };
   

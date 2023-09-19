@@ -250,7 +250,7 @@ module.exports = {
                               const cancelEmbed = new EmbedBuilder()
                                   .setColor(0x00FF00)
                                   .setTitle(`Success`)
-                                  .setDescription(`The strike operation has been cancelled and ${mentionedUser.username} will not receive a strike.`)
+                                  .setDescription(`:white_check_mark: The strike operation has been cancelled and ${mentionedUser.username} will not receive a strike.`)
                                   .setThumbnail(mentionedUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
                               interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
 
@@ -367,7 +367,7 @@ module.exports = {
                             const cancelEmbed = new EmbedBuilder()
                               .setColor(0x00FF00)
                               .setTitle(`Success`)
-                              .setDescription(`The strike operation has been cancelled and ${interaction.options.getUser('user').username} will not receive a strike.`)
+                              .setDescription(`:white_check_mark: The strike operation has been cancelled and ${interaction.options.getUser('user').username} will not receive a strike.`)
                               .setThumbnail(interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
                             interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
 
@@ -481,7 +481,7 @@ module.exports = {
               const cancelEmbed = {
                   color: 0x00FF00,
                   title: `Success`,
-                  description: `The strike operation has been cancelled and ${interaction.options.getUser('user').username} will not receive a strike.`,
+                  description: `:white_check_mark: The strike operation has been cancelled and ${interaction.options.getUser('user').username} will not receive a strike.`,
                   thumbnail: {
                       url: interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                   }

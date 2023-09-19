@@ -24,7 +24,7 @@ module.exports = {
             await interaction.channel.bulkDelete(messages, true);
 
             const successEmbed = new EmbedBuilder().setColor('#00FF00').setTitle('Success')
-            .setDescription(`Successfully deleted ${amountToDelete} messages.`);
+            .setDescription(`:white_check_mark: Successfully deleted **${amountToDelete}** messages.`);
 
             interaction.reply({ embeds: [successEmbed], ephemeral: true });
         } catch (error) {

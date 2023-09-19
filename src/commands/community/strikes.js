@@ -50,15 +50,14 @@ module.exports = {
             .setColor(0xFF0000)
             .setTimestamp()
             .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-            .setDescription(`❗ **${target.tag}** (<@${target.id}>) has **${data.strikeCount}** ${data.strikeCount === 1 ? 'strike' : 'strikes'}.\n${data.content.map(
+            .setDescription(`❗ **${target.tag}** (<@${target.id}>) has **${data.strikeCount}** ${data.strikeCount === 1 ? 'strike' : 'strikes'} in **${interaction.guild.name}**.\n${data.content.map(
                 (w, i) => 
-                  `
-                    **Strike**: ${i + 1}
-                    **Moderator**: <@${w.ExecutorID}>
-                    **Rule violated**: ${w.RuleBroken}
-                    **Explanation**: ${w.StrikeDetails}
-                  `
-                ).join(`\n`)}`);
+                `
+                **Strike**: ${i + 1}
+                **Moderator**: <@${w.ExecutorID}>
+                **Reason**: ${w.Reason || "No reason provided"}
+                `
+            ).join('')}`);
             try {
                 await interaction.reply({ embeds: [embed], ephemeral: true });
             } catch (err) {

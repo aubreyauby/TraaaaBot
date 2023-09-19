@@ -19,7 +19,7 @@ module.exports = async (client, interaction) => {
       if (!devs.includes(interaction.member.id)) {
         const noPermission = new EmbedBuilder().setColor(0xFF0000)
         .setTitle(`Error`)
-        .setDescription(`This command is only available for selected members.`)
+        .setDescription(`:x: This command is only available for selected members.`)
         return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
@@ -28,7 +28,7 @@ module.exports = async (client, interaction) => {
       if (!(interaction.guild.id === testServer)) {
         const noPermission = new EmbedBuilder().setColor(0xFF0000)
         .setTitle(`Error`)
-        .setDescription(`This command is only available in selected guilds.`)
+        .setDescription(`:x: This command is only available in selected guilds.`)
         return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
@@ -38,7 +38,7 @@ module.exports = async (client, interaction) => {
         if (!interaction.member.permissions.has(permission)) {
           const noPermission = new EmbedBuilder().setColor(0xFF0000)
           .setTitle(`Error`)
-          .setDescription(`You do not have permission to use this command.`)
+          .setDescription(`:x: You do not have permission to use this command.`)
           return await interaction.reply({ embeds: [noPermission], ephemeral: true });
         }
       }
