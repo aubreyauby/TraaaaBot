@@ -58,6 +58,7 @@ module.exports = {
         .setColor(0x3498db);
 
         const selectOptions = [
+            { label: 'Home', description: 'Return to the welcome message.', value: 'home', emoji: '🏠' || null },
             { label: 'Community', description: 'General commands available to all members of the server.', value: 'community', emoji: '👥' || null },
             { label: 'Economy', description: 'Economic features like ranks and TraaaaBot coins.', value: 'economy', emoji: '💰' || null },
             { label: 'Media', description: 'Commands that utilize images sent by users and in voice channels.', value: 'media', emoji: '🎤' || null },
@@ -98,24 +99,35 @@ module.exports = {
 
         collector.on('collect', async (interaction) => {
             const [directory] = interaction.values;
-            const categoryCommands = communityCommands.filter(cmd => cmd.category === directory);
-
-            const categoryEmbed = new EmbedBuilder()
-                .setTitle(`${formatString(directory)}`).setColor(0x3498db)
-                .setAuthor({ name: 'TraaaaBot', iconURL: client.user.displayAvatarURL() })
-                .setDescription(`A list of all the commands categorized under ${directory}:`)
-                .addFields(
-                    categoryCommands.map((cmd) => {
-                        return {
-                            name: `\`${cmd.name}\``,
-                            value: cmd.description || 'No description provided.',
-                            inline: true,
-                        };
-                    })
-                );
-
-            interaction.update({embeds: [categoryEmbed], ephemeral: true});
-        });
+        
+            if (directory === 'home') {
+                // If the user selected "Home," show the welcomeEmbed.
+                interaction.update({
+                    embeds: [welcomeEmbed],
+                    components: components(false),
+                    ephemeral: true
+                });
+            } else {
+                // If the user selected another category, show the commands for that category.
+                const categoryCommands = communityCommands.filter(cmd => cmd.category === directory);
+        
+                const categoryEmbed = new EmbedBuilder()
+                    .setTitle(`${formatString(directory)}`).setColor(0x3498db)
+                    .setAuthor({ name: 'TraaaaBot', iconURL: client.user.displayAvatarURL() })
+                    .setDescription(`A list of all the commands categorized under ${directory}:`)
+                    .addFields(
+                        categoryCommands.map((cmd) => {
+                            return {
+                                name: `\`${cmd.name}\``,
+                                value: cmd.description || 'No description provided.',
+                                inline: true,
+                            };
+                        })
+                    );
+        
+                interaction.update({embeds: [categoryEmbed], ephemeral: true});
+            }
+        });        
 
         collector.on("end", () => {
             initialMessage.edit({ components: components(true) });

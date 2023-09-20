@@ -28,7 +28,7 @@ module.exports = {
             const errorEmbed = {
                 color: 0xFF0000,
                 title: `Error`,
-                description: `❌ There was an issue removing the strike for <@${target.id}>. Please provide a valid strike number.`,
+                description: `❌ There was an issue removing the strike for <@${target.id}>. Please provide a valid strike number and try again later.`,
                 thumbnail: {
                     url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                 }
