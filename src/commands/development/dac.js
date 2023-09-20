@@ -120,7 +120,7 @@ module.exports = {
           .setColor(0xff0000)
           .setTitle(`Error`)
           .setDescription(
-            `:x: Unable to fulfill this request. Errors:\n\`\`\`${errors.join(
+            `:x: Unable to fulfill this request due to the following error(s):\n\`\`\`${errors.join(
               "\n"
             )}\`\`\``
           );

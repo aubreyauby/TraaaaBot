@@ -51,7 +51,7 @@ module.exports = async (client, interaction) => {
         if (!bot.permissions.has(permission)) {
           const noPermission = new EmbedBuilder().setColor(0xFF0000)
           .setTitle(`Error`)
-          .setDescription(`TraaaaBot cannot use this command because it lacks a permission to do so. Try modifying the permissions for the bot and try again later.`)
+          .setDescription(`:x: Cannot run this command because TraaaaBot lacks a permission in this server to do so. Try modifying the permissions for the bot and try again later.`)
           return await interaction.reply({ embeds: [noPermission], ephemeral: true });
         }
       }

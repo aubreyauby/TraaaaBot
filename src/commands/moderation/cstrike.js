@@ -3,7 +3,6 @@ const { Client,
     ButtonBuilder,
     ButtonStyle,
     ActionRowBuilder,
-    PermissionsBitField,
     PermissionFlagsBits,
     ApplicationCommandOptionType } = require('discord.js');
 const strikeSchema = require('../../models/strike');
@@ -14,9 +13,6 @@ module.exports = {
      * @param {Interaction} interaction
      */
     callback: async (client, interaction) => {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) 
-        return await interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true });
-
         const { options, guildId } = interaction;
         const target = options.getUser('user');
 
@@ -71,7 +67,7 @@ module.exports = {
                 });
 
                 const resultEmbed = {
-                    color: 0x5cb85c,
+                    color: 0x00ff00,
                     title: `Success`,
                     description: `<@${target.id}>'s strikes have been cleared from this server.`,
                     thumbnail: {
@@ -85,8 +81,8 @@ module.exports = {
                 buttonResponseProvided = true;
             } else if (i.customId === 'cstrcancel') {
                 const cancelEmbed = {
-                    color: 0xFF0000,
-                    title: `Error`,
+                    color: 0x00ff00,
+                    title: `Success`,
                     description: `Clear strike operation for <@${target.id}> was cancelled.`,
                     thumbnail: {
                         url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })

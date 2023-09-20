@@ -120,7 +120,7 @@ module.exports = {
   },
 
   name: "kick",
-  description: "Kick a user from the server.",
+  description: "Kick a member from the server.",
   options: [
       {
           name: "user",

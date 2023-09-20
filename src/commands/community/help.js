@@ -80,7 +80,10 @@ module.exports = {
             ),
         ];
 
-        const initialMessage = await interaction.reply({
+        await interaction.deferReply({ ephemeral: true });
+
+        // Your logic for sending the welcome message and setting up the collector
+        const initialMessage = await interaction.followUp({
             embeds: [welcomeEmbed],
             components: components(false),
             ephemeral: true

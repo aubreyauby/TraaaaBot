@@ -71,11 +71,11 @@ module.exports = {
     },
 
     name: 'lookout',
-    description: "Sends out advisories to a specified text channel about a user's activity.",
+    description: "Sends out advisories to a specified text channel about a member's activity.",
     options: [
         {
             name: "type",
-            description: "Choose whether to add or remove a user from lookout.",
+            description: "Choose whether to add or remove a member from lookout.",
             type: ApplicationCommandOptionType.String,
             required: true,
             choices: [
@@ -90,8 +90,8 @@ module.exports = {
             ]
         },
         {
-            name: "user",
-            description: "The user to place on lookout.",
+            name: "member",
+            description: "The member to place on lookout.",
             type: ApplicationCommandOptionType.Mentionable,
             required: true
         }

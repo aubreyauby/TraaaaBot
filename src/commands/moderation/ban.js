@@ -5,6 +5,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require("discord.js");
+const Configure = require('../../models/configure');
 const Ban = require('../../models/ban');
 
 module.exports = {
@@ -19,21 +20,21 @@ module.exports = {
 
         // Check if the target user is the bot itself.
         if (targetUser.id === client.user.id) {
-            const botBanErrorEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000)
+            const botBanErrorEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000).setThumbnail(targetUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
                 .setDescription(":x: You cannot ban the bot itself.");
             return interaction.reply({ embeds: [botBanErrorEmbed], ephemeral: true });
         }
 
         // Check if the target user is the owner of the server.
         if (targetUser.id === guild.ownerId) {
-            const ownerBanErrorEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000)
+            const ownerBanErrorEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000).setThumbnail(targetUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
                 .setDescription(":x: You cannot ban the owner of this server.");
             return interaction.reply({ embeds: [ownerBanErrorEmbed], ephemeral: true });
         }
 
         // Check if TraaaaBot has permission to ban members in the guild.
         if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
-            const botNoPermissionEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000)
+            const botNoPermissionEmbed = new EmbedBuilder().setTitle("Error").setColor(0xff0000).setThumbnail(targetUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
                 .setDescription(":x: TraaaaBot does not have the Ban Members permission in this server. Please check the permissions and try again later.");
             return interaction.reply({ embeds: [botNoPermissionEmbed], ephemeral: true });
         }
@@ -47,6 +48,15 @@ module.exports = {
             86400: "Past 24 Hours",
             259200: "Past 3 Days",
             604800: "Past 7 Days",
+        };
+
+        const durationChoices = {
+            10: "10 Seconds",
+            86400: "1 Day",
+            259200: "3 Days",
+            604800: "1 Week (7 Days)",
+            1209600: "2 Weeks (14 Days)",
+            2592000: "1 Month",
         };
 
         const deleteTimeframe = deleteTimeframeChoices[deleteTimeframeChoice];
@@ -99,43 +109,97 @@ module.exports = {
         
             // Ban the user
             await guild.members.ban(targetUser, { reason: reason });
+            
 
             if (deleteTimeframeChoice) {
                 try {
                     // Fetch messages from the channel
                     const messages = await interaction.channel.messages.fetch({ limit: 100 });
-            
+                
                     // Calculate the timestamp cutoff
                     const timestampCutoff = Date.now() - deleteTimeframeChoice * 1000;
-            
+                
                     // Filter and delete messages older than the timestamp cutoff
                     const messagesToDelete = messages.filter((msg) => {
                         return msg.author.id === targetUser.id && msg.createdTimestamp >= timestampCutoff;
                     });
-            
+                
                     // Notify that messages were deleted
                     let delMsgValue = `:white_check_mark: **${messagesToDelete.size}** message${messagesToDelete.size === 1 ? '' : 's'} from the **${deleteTimeframe.toLowerCase()}** have been deleted.`;
-                    if (messagesToDelete.size === 0) { delMsgValue = `:x: No messages from the **${deleteTimeframe.toLowerCase()}** have been deleted because there was none to delete.`; }
+            
+                    if (messagesToDelete.size === 0) {
+                        delMsgValue = `:x: No messages from the **${deleteTimeframe.toLowerCase()}** have been deleted.`;
+                    }
+            
+                    // Set the deletedMessagesField based on whether messages were deleted or not
+                    deletedMessagesField = `:boom: ${delMsgValue}\n`;
+                
                     userBannedEmbed.addFields({
                         name: "Deleted Messages",
                         value: delMsgValue,
                         inline: false,
                     });
-            
+                
                     if (messagesToDelete.size > 0) {
-                        // Convert messages to an array of message IDs
                         const messageIdsToDelete = messagesToDelete.map((msg) => msg.id);
-            
-                        // Delete messages in batches of 100 to respect Discord's rate limits
-                        while (messageIdsToDelete.length > 0) {
-                            const batch = messageIdsToDelete.splice(0, 100);
-                            await interaction.channel.bulkDelete(batch);
-                        }
+                        await interaction.channel.bulkDelete(messageIdsToDelete);
                     }
                 } catch (error) {
                     console.error("Error deleting messages:", error);
                 }
             }
+
+            // Log the ban to a modlog channel if logging is enabled
+            const serverId = guild.id;
+            const config = await Configure.findOne({ guildId: serverId });
+
+            if (config && config.modlogChannel && config.modlogIsEnabled) {
+                const modlogChannel = guild.channels.cache.get(config.modlogChannel);
+                if (modlogChannel) {
+                    let delMsgValue = ""; // Initialize the variable
+                    const expirationDate = duration ? new Date(Date.now() + duration * 1000) : null;
+                    const expirationString = expirationDate ? `until <t:${Math.floor(expirationDate / 1000)}:f>` : "Permanent";
+                    if (deleteTimeframeChoice) {
+                        try {
+                            // Fetch messages from the channel
+                            const messages = await interaction.channel.messages.fetch({ limit: 100 });
+                    
+                            // Calculate the timestamp cutoff
+                            const timestampCutoff = Date.now() - deleteTimeframeChoice * 1000;
+                    
+                            // Filter and delete messages older than the timestamp cutoff
+                            const messagesToDelete = messages.filter((msg) => {
+                                return msg.author.id === targetUser.id && msg.createdTimestamp >= timestampCutoff;
+                            });
+                    
+                            // Notify that messages were deleted
+                            if (messagesToDelete.size > 0) {
+                                delMsgValue = `:white_check_mark: **${messagesToDelete.size}** message${messagesToDelete.size === 1 ? '' : 's'} from the **${deleteTimeframe.toLowerCase()}** have been deleted.`;
+                            }
+                        } catch (error) {
+                            console.error("Error deleting messages:", error);
+                        }
+                    }
+            
+                    // Create the ban log embed
+                    const banLogEmbed = new EmbedBuilder()
+                    .setColor(0xEE4B2B)
+                    .setTitle(`Member Banned`)
+                    .setAuthor({ name: targetUser.tag, iconURL: targetUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }) })
+                    .setDescription(
+                        `**Member:** <@${targetUser.id}>\n` +
+                        `**Moderator:** <@${interaction.user.id}>\n` +
+                        `**Reason:** ${reason}\n` +
+                        `**Duration:** ${duration ? `${durationChoices[duration]} (${expirationString})` : "Permanent"}\n` + 
+                        delMsgValue // Include the delMsgValue variable in the description
+                    )
+                    .setTimestamp()
+                    .setFooter(({text: `Member ID: ${targetUser.id}`}));
+                
+            
+                    modlogChannel.send({ embeds: [banLogEmbed] });
+                }
+            }            
 
             return interaction.reply({ embeds: [userBannedEmbed] });
         } catch (error) {
@@ -151,6 +215,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setTitle("Error")
                 .setColor(0xff0000)
+                .setThumbnail(targetUser.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
                 .setDescription(`:x: An error occurred while trying to ban the user:\n\`\`\`${error.message}\`\`\``);
             console.log(error);
             return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
@@ -158,7 +223,7 @@ module.exports = {
     },
 
     name: "ban",
-    description: "Ban a user from the server.",
+    description: "Ban a member from the server.",
     options: [
         {
             name: "user",

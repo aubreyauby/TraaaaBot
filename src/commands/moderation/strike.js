@@ -70,9 +70,13 @@ module.exports = {
         const attachmentEmbed = {
             color: 0x3498db,
             title: `Add evidence for ${interaction.options.getUser('user').username}'s strike?`,
-            description: `Would you like to attach evidence for <@${interaction.options.getUser('user').id}>'s strike? This would allow <@${interaction.options.getUser('user').id}> and your moderators to see detailed evidence of why a strike was given.\n\n:warning:  If you submit attachments by a Discord link, they will be accessible until they are deleted. You cannot modify attachments after the strike was given.`,
+            description: `:question: Would you like to provide attachments for <@${interaction.options.getUser('user').id}>'s strike? This would allow <@${interaction.options.getUser('user').id}> and your moderators to see detailed evidence of why a strike was given.\n\n:warning:  If you submit attachments by a Discord link, they will be accessible until they are deleted. You cannot modify attachments after the strike was given.`,
             thumbnail: {
                 url: interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+            },
+            author: {
+              name: interaction.options.getUser('user').username, 
+              iconURL: interaction.options.getUser('user').avatarURL()
             }
         };
 

@@ -59,17 +59,17 @@ module.exports = {
     },
 
     name: 'rstrike',
-    description: "Removes a specific strike from a user.",
+    description: "Removes a specific strike from a member.",
     options: [
         {
             name: "user",
-            description: "The user you want to clear the strikes of.",
+            description: "The member you want to clear the strikes of.",
             type: ApplicationCommandOptionType.Mentionable,
             required: true
         },
         {
             name: "strike",
-            description: "The strike number you want to remove from the user.",
+            description: "The strike number you want to remove from the member.",
             type: ApplicationCommandOptionType.Integer,
             required: true
         }

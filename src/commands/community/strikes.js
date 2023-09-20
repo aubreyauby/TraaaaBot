@@ -26,12 +26,7 @@ module.exports = {
             .setColor(0x00FF00)
             .setTimestamp()
             .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-            .setDescription(`✅ **${target.tag}** (<@${target.id}>) has no strikes!\n\nThank you for following the rules.`)
-
-        // Build the embed that tells the member to check their DMs for either their own or other members' strike logs.
-        const sentConfirmation = new EmbedBuilder()
-            .setColor(0x00FF00)
-            .setDescription(`✅ Check your DMs for ${target.id === invoker.id ? 'your' : `<@${target.id}>'s`} strike logs.`)
+            .setDescription(`✅ <@${target.id}> has no strikes!\n\nThank you for following the rules.`)
             
         // Build the embed that tells the member that they do not have permission to view the strike logs of other members.
         const viewYourOwn = new EmbedBuilder()
@@ -50,7 +45,7 @@ module.exports = {
             .setColor(0xFF0000)
             .setTimestamp()
             .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-            .setDescription(`❗ **${target.tag}** (<@${target.id}>) has **${data.strikeCount}** ${data.strikeCount === 1 ? 'strike' : 'strikes'} in **${interaction.guild.name}**.\n${data.content.map(
+            .setDescription(`❗ <@${target.id}> has **${data.strikeCount}** ${data.strikeCount === 1 ? 'strike' : 'strikes'} in **${interaction.guild.name}**.\n${data.content.map(
                 (w, i) => 
                 `
                 **Strike**: ${i + 1}

@@ -277,7 +277,7 @@ module.exports = {
     },
     wrgp: {
       streamUrl: "https://s2.voscast.com:11835/stream",
-      stationIconUrl: "https://cdn.onlineradiobox.com/img/l/1/31581.v2.png",
+      stationIconUrl: "https://panthernow.com/wp-content/uploads/IVYiH1D_1.jpeg",
       countryCode: "US",
       ownerName: "Florida International University",
     },
@@ -292,6 +292,18 @@ module.exports = {
       stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/96.3_KKLZ_Logo.png/440px-96.3_KKLZ_Logo.png",
       countryCode: "US",
       ownerName: "Beasley Broadcast Group",
+    },
+    whtz: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc1469/hls.m3u8?streamid=1469&zip=33436&clientType=web&host=webapp.US&modTime=1695172793480&profileid=1876726650&terminalid=159&territory=US&us_privacy=1-N-&callLetters=WHTZ-FM&devicename=web-desktop&stationid=1469&dist=iheart&subscription_type=free&partnertok=eyJraWQiOiJpaGVhcnQiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsc2lkIjoiY29va2llOm11OXR1emkwbiIsImF1ZCI6InRkIiwic3ViIjoiMTg3NjcyNjY1MCIsImNvcHBhIjowLCJpc3MiOiJpaGVhcnQiLCJ1c19wcml2YWN5IjoiMVlOTiIsImRpc3QiOiJpaGVhcnQiLCJleHAiOjE2OTUyNTkxOTQsImlhdCI6MTY5NTE3Mjc5NCwib21pZCI6MH0.neBgE67Ls6SXhkJ5k0Ftip6soBP-d58MwNJ3UIe_w0E&country=US&locale=en-US&site-url=https%3A%2F%2Fwww.iheart.com%2Flive%2Fz100-1469%2F&triton-uid=cookie%3Amu9tuzi0n",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/e/e2/WHTZ_logo.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
+    },
+    waxq: {
+      streamUrl: "https://stream.revma.ihrhls.com/zc1465/hls.m3u8?streamid=1465&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7667754383&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7667754383&stationid=1465&terminalId=159&territory=US",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/Waxq07logo.png/300px-Waxq07logo.png",
+      countryCode: "US",
+      ownerName: "iHeartMedia",
     }
   };
   

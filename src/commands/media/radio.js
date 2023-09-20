@@ -24,15 +24,15 @@ module.exports = {
 
     const notinVC = new EmbedBuilder().setColor(0xff0000).setTitle(`Error`)
       .setDescription(`:x: Please join a voice channel to use this command.`);
-    if (!channel) return await interaction.reply({ embeds: [notinVC] });
+    if (!channel) return await interaction.reply({ embeds: [notinVC], ephemeral: true });
 
     const noConnectPerm = new EmbedBuilder().setColor(0xff0000).setTitle(`Error`)
       .setDescription(`:x: TraaaaBot does not have the \`CONNECT\` permission in this guild. Please allow an administrator to modify the permissions and try again later.`);
-    if (!channel.permissionsFor(client.user).has(PermissionsBitField.Flags.Connect)) return await interaction.reply({ embeds: [noConnectPerm] });
+    if (!channel.permissionsFor(client.user).has(PermissionsBitField.Flags.Connect)) return await interaction.reply({ embeds: [noConnectPerm], ephemeral: true });
 
     const noSpeakPerm = new EmbedBuilder().setColor(0xff0000).setTitle(`Error`)
       .setDescription(`:x: TraaaaBot does not have the \`SPEAK\` permission in this guild. Please allow an administrator to modify the permissions and try again later.`);
-    if (!channel.permissionsFor(client.user).has(PermissionsBitField.Flags.Speak)) return await interaction.reply({ embeds: [noSpeakPerm] });
+    if (!channel.permissionsFor(client.user).has(PermissionsBitField.Flags.Speak)) return await interaction.reply({ embeds: [noSpeakPerm], ephemeral: true });
 
     const invalidStationLengthEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
       .setDescription(`:x: The station callsign must be 3-4 letters long.\n\n Examples: \`wcrb\` or \`wbz\``);
@@ -91,7 +91,7 @@ module.exports = {
         .setAuthor({name: "TraaaaBot Music", iconURL: client.user.displayAvatarURL()})
         .setDescription(`Now listening to **${stationName}**.`)
         .setThumbnail(stationIconUrl)
-        .setTitle(`🎵 Now playing in ${channel.name}`)
+        .setTitle(`🎵 Now playing in <#${channel.id}>`)
         .addFields(
           { name: 'Requested By', value: `<@${interaction.user.id}>`, inline: false },
           { name: 'Station Owner', value: ownerName, inline: true }
