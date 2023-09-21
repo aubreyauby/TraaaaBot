@@ -3,12 +3,45 @@ const getLocalCommands = require('../../utils/getLocalCommands');
 const { EmbedBuilder } = require('discord.js');
 const path = require('path');
 
+// This is responsible for command cooldowns.
+const commandUsageCounts = new Map();
+const MAX_COMMANDS_PER_MINUTE = 3;
+const WINDOW_DURATION = 60000;
+
 module.exports = async (client, interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const localCommands = getLocalCommands();
 
   try {
+    // Check if the user is on cooldown for the specific command
+    const { user } = interaction;
+    const commandName = interaction.commandName;
+    const usageKey = `${user.id}-${commandName}`;
+    const isExemptUser = user.id === '817818570431004752';
+
+    if (!isExemptUser && commandUsageCounts.has(usageKey)) {
+      const { timestamp, count } = commandUsageCounts.get(usageKey);
+
+      if (Date.now() - timestamp > WINDOW_DURATION) {
+        // Reset the command count for the new window
+        commandUsageCounts.set(usageKey, { timestamp: Date.now(), count: 1 });
+      } else {
+        if (count >= MAX_COMMANDS_PER_MINUTE) {
+          const cooldownEmbed = new EmbedBuilder().setColor(0xFF0000)
+            .setTitle(`Error`)
+            .setDescription(`:x: You have exceeded the command limit (${MAX_COMMANDS_PER_MINUTE} commands per minute for this command). Please wait before you can run it again.`);
+          return await interaction.reply({ embeds: [cooldownEmbed], ephemeral: true });
+        } else {
+          // Increment the command count for the current window
+          commandUsageCounts.set(usageKey, { timestamp, count: count + 1 });
+        }
+      }
+    } else {
+      // Initialize the command count for the user and command
+      commandUsageCounts.set(usageKey, { timestamp: Date.now(), count: 1 });
+    }
+
     const commandObject = localCommands.find(
       (cmd) => cmd.name === interaction.commandName
     );
@@ -18,8 +51,8 @@ module.exports = async (client, interaction) => {
     if (commandObject.devOnly) {
       if (!devs.includes(interaction.member.id)) {
         const noPermission = new EmbedBuilder().setColor(0xFF0000)
-        .setTitle(`Error`)
-        .setDescription(`:x: This command is only available for selected members.`)
+          .setTitle(`Error`)
+          .setDescription(`:x: This command is only available for selected members.`);
         return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
@@ -27,8 +60,8 @@ module.exports = async (client, interaction) => {
     if (commandObject.testOnly) {
       if (!(interaction.guild.id === testServer)) {
         const noPermission = new EmbedBuilder().setColor(0xFF0000)
-        .setTitle(`Error`)
-        .setDescription(`:x: This command is only available in selected guilds.`)
+          .setTitle(`Error`)
+          .setDescription(`:x: This command is only available in selected guilds.`);
         return await interaction.reply({ embeds: [noPermission], ephemeral: true });
       }
     }
@@ -37,21 +70,8 @@ module.exports = async (client, interaction) => {
       for (const permission of commandObject.permissionsRequired) {
         if (!interaction.member.permissions.has(permission)) {
           const noPermission = new EmbedBuilder().setColor(0xFF0000)
-          .setTitle(`Error`)
-          .setDescription(`:x: You do not have permission to use this command.`)
-          return await interaction.reply({ embeds: [noPermission], ephemeral: true });
-        }
-      }
-    }
-
-    if (commandObject.botPermissions?.length) {
-      for (const permission of commandObject.botPermissions) {
-        const bot = interaction.guild.members.me;
-
-        if (!bot.permissions.has(permission)) {
-          const noPermission = new EmbedBuilder().setColor(0xFF0000)
-          .setTitle(`Error`)
-          .setDescription(`:x: Cannot run this command because TraaaaBot lacks a permission in this server to do so. Try modifying the permissions for the bot and try again later.`)
+            .setTitle(`Error`)
+            .setDescription(`:x: You do not have permission to use this command.`);
           return await interaction.reply({ embeds: [noPermission], ephemeral: true });
         }
       }

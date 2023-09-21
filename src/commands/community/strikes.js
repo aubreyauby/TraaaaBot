@@ -20,7 +20,6 @@ module.exports = {
             userTag: target.tag,
         });
 
-        // Build the embed that tells the member that they do not have any strikes in the server.
         const noStrikes = new EmbedBuilder()
             .setTitle(`${target.tag}'s Strike Logs`)
             .setColor(0x00FF00)
@@ -28,12 +27,10 @@ module.exports = {
             .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
             .setDescription(`✅ <@${target.id}> has no strikes!\n\nThank you for following the rules.`)
             
-        // Build the embed that tells the member that they do not have permission to view the strike logs of other members.
         const viewYourOwn = new EmbedBuilder()
             .setColor(0xFF0000)
             .setDescription(`❌ You do not have permission to view the strike logs of other members.`)
 
-        // If the target is not the same as the invoking user and they don't have "Manage Messages" permission, prohibit viewing other members' strike logs
         if (target.id !== invoker.id && !member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
             interaction.reply({ embeds: [viewYourOwn] })
             return;
@@ -72,11 +69,11 @@ module.exports = {
     },
 
     name: 'strikes',
-    description: "Checks the strikes of a user.",
+    description: "Checks the strikes of a member.",
     options : [
         {
-            name: "user",
-            description: "The user to view the strikes of.",
+            name: "member",
+            description: "The member to view the strikes of.",
             type: ApplicationCommandOptionType.Mentionable,
             required: false
         }

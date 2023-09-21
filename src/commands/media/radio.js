@@ -11,6 +11,7 @@ const {
   createAudioResource,
 } = require("@discordjs/voice");
 const stationData = require('../../utils/stationData');
+const stringSimilarity = require('string-similarity');
 
 module.exports = {
   /**
@@ -47,10 +48,7 @@ module.exports = {
         .setColor(0x9d5cff)
         .setAuthor({ name: "TraaaaBot Music", iconURL: client.user.displayAvatarURL() })
         .setTitle("List of Radio Stations on TraaaaBot")
-        .setDescription("TraaaaBot has the following radio stations available for streaming in the voice channels:")
-        .addFields(
-          { name: 'Stations', value: stationList.join(', '), inline: false }
-        );
+        .setDescription(`TraaaaBot has the following radio stations available:\n\n${stationList.join(', ')}`)
 
       return interaction.reply({ embeds: [stationListEmbed] });
     }
@@ -99,7 +97,6 @@ module.exports = {
         
         if (countryCode === 'US') {nowPlayingEmbed.addFields({ name: 'Country', value: `🇺🇸 \`US\``, inline: true});} 
         else if (countryCode === 'CA') {nowPlayingEmbed.addFields({ name: 'Country', value: `🇨🇦 \`CA\``, inline: true});}
-        if (stationName === 'WMLV' || stationName === 'KFMK') {nowPlayingEmbed.setDescription(`Now listening to **${stationName}**.\n\n:warning: EMF-owned stations usually tend to crash frequently.`).setColor(0xFFFF00)}
         interaction.reply({ embeds: [nowPlayingEmbed] });
     
       player.on("error", (error) => {
@@ -145,10 +142,33 @@ module.exports = {
         }
       });
     } else {
+      function findNearMatchingStations(stationArgument, stationDataArray, thresholdScore) {
+        const matches = [];
+        for (const station of stationDataArray) {
+          const score = stringSimilarity.compareTwoStrings(stationArgument.toLowerCase(), station.stationName.toLowerCase());
+          if (score >= thresholdScore) {
+            matches.push(station.stationName);
+          }
+        }
+        return matches;
+      }
+      
+      const stationDataArray = Object.keys(stationData).map(key => ({stationName: key, ...stationData[key] }));
+      
+      const thresholdScore = 0.6;
+      
+      const similarStations = findNearMatchingStations(stationArgument, stationDataArray, thresholdScore);
+      
       const notAvailable = new EmbedBuilder()
-      .setColor(0xff0000)
-      .setTitle(`Error`)
-      .setDescription(`:x: **${stationArgument.toUpperCase()}** either does not exist or is not available on TraaaaBot yet.`);
+        .setColor(0xff0000)
+        .setTitle(`Error`)
+        .setDescription(`:x: **${stationArgument.toUpperCase()}** either does not exist or is not available on TraaaaBot yet.`);
+      
+      if (similarStations.length > 0) {
+        const formattedMatches = similarStations.map(station => `\`${station}\``).join(', ');
+        notAvailable.addFields({ name: 'Did you mean one of these?', value: formattedMatches });
+      }
+      
       return interaction.reply({ embeds: [notAvailable], ephemeral: true });
     }
   },
@@ -158,7 +178,7 @@ module.exports = {
   options: [
     {
       name: "station",
-      description: "The callsign of the station to listen to.",
+      description: "The callsign of the station to listen to. Type list for the list of stations.",
       type: ApplicationCommandOptionType.String,
       required: true,
     },

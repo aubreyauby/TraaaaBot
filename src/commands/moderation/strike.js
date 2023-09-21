@@ -23,7 +23,8 @@ module.exports = {
       if (mentionedUser.id === client.user.id) {
           const noBotStrike = new EmbedBuilder().setColor(0xFF0000)
           .setTitle(`Error`)  
-          .setDescription(`You cannot strike the bot itself.`)
+          .setDescription(`:x: You cannot strike the bot itself.`)
+          .setThumbnail(mentionedUser.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
           return await interaction.reply({ embeds: [noBotStrike], ephemeral: true });
       }
 
@@ -31,7 +32,7 @@ module.exports = {
       if (!interaction.guild.members.cache.has(mentionedUser.id)) {
         const notInServerEmbed = new EmbedBuilder().setColor(0xFF0000)
           .setTitle(`Error`)
-          .setDescription(`**${mentionedUser.username}** (<@${mentionedUser.id}>) is not on this server and cannot be given a strike.`)
+          .setDescription(`:x: <@${mentionedUser.id}> is not on this server and cannot be given a strike.`)
           .setThumbnail(mentionedUser.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
         return await interaction.reply({ embeds: [notInServerEmbed], ephemeral: true });
       }
@@ -41,7 +42,7 @@ module.exports = {
       if (ongoingStrikeProcesses.has(userId)) {
         const ongoingStrikeEmbed = new EmbedBuilder().setColor(0xFF0000)
         .setTitle(`Error`)
-        .setDescription(`You already have an ongoing strike process. Please complete it before starting a new one.`)
+        .setDescription(`:x: You already have an ongoing strike process. Please complete it before starting a new one.`)
         return await interaction.reply({ embeds: [ongoingStrikeEmbed], ephemeral: true });
       }
       ongoingStrikeProcesses.set(userId, interaction);
@@ -305,7 +306,6 @@ module.exports = {
                               userTag: target.tag
                             });
                       
-                            // If the data was not found, create a new one.
                             if (!data) {
                               data = new strikeSchema({
                                 guildID: guildId,
@@ -333,8 +333,7 @@ module.exports = {
                             .addFields(
                                 { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                                 { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                                { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                                { name: 'Explanation', value: strikeDetailsValue, inline: false }
+                                { name: 'Reason', value: reason, inline: false }
                             )
                   
                             let sentDMConfirmation = "";
@@ -354,8 +353,7 @@ module.exports = {
                               .addFields(
                                   { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
                                   { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                                  { name: 'Rule violated', value: whatRuleWasViolatedValue || 'No rule mentioned', inline: false },
-                                  { name: 'Explanation', value: strikeDetailsValue, inline: false },
+                                  { name: 'Reason', value: reason, inline: false },
                                   { name: 'Delivered to DM?', value: sentDMConfirmation, inline: false },
                               );
 
@@ -363,30 +361,23 @@ module.exports = {
 
                               // Terminate all processes
                               ongoingStrikeProcesses.delete(userId, interaction);
-                              submitCollector.stop();  
-                              attachmentCollector.stop();
-                              collector.stop();
+                              submitCollector.stop(); attachmentCollector.stop(); collector.stop();
                               return;
                           } else if (dbi.customId === 'dbcancelStrike') {
-                            const cancelEmbed = new EmbedBuilder()
-                              .setColor(0x00FF00)
-                              .setTitle(`Success`)
+                            const cancelEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle(`Success`)
                               .setDescription(`:white_check_mark: The strike operation has been cancelled and ${interaction.options.getUser('user').username} will not receive a strike.`)
                               .setThumbnail(interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
-                            interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
+                            
+                              interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
 
                             // Terminate all processes
                             ongoingStrikeProcesses.delete(userId, interaction);
-                            dbsubmitCollector.stop();
-                            attachmentCollector.stop();
-                            collector.stop();
+                            dbsubmitCollector.stop(); attachmentCollector.stop(); collector.stop();
                             return;
                           }
                         });
                     }
-                  } catch (error) {
-                    
-                  }
+                  } catch (error) { console.log(error.stack);}
               } else {
                 const invalidAttachmentEmbed = new EmbedBuilder().setColor(0xFF0000)
                   .setTitle(`Invalid Attachment`)
@@ -396,14 +387,23 @@ module.exports = {
                 const invalidAttachmentRow = new ActionRowBuilder().addComponents(forgetAboutIt);
         
                 interaction.editReply({ embeds: [invalidAttachmentEmbed], components: [invalidAttachmentRow] });
-              }
-              // Delete the attachments from the message that was sent.      
+              }   
               msg.delete().catch(console.error);
             });
         
-            attachmentCollector.on('end', async (collected) => {
-              if (collected.size === 0) {
-                // Handle the case when no attachments are submitted within the specified time...
+            attachmentCollector.on('end', (collected, reason) => {
+              if (reason === 'time') {
+                const timeoutEmbed = new EmbedBuilder().setColor(0xFF0000)
+                  .setTitle(`Error`)
+                  .setDescription(`:x: You did not submit any attachments within the time limit. The strike request has timed out.`)
+                  .setThumbnail(interaction.options.getUser('user').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                
+                interaction.editReply({ embeds: [timeoutEmbed], components: [] });
+                
+                ongoingStrikeProcesses.delete(userId, interaction);
+                attachmentCollector.stop();
+                collector.stop();
+                return;
               }
             });
             
@@ -440,7 +440,6 @@ module.exports = {
             }
 
             await data.save();
-            console.log(`\x1b[1;34mINFO \x1b[0mStrike information has been written to the database:\nguildID: ${guildId}\nuserID:${target.id}\nuserTag: ${target.tag}\nstrikeCount: ${data.strikeCount}\ncontent:\n${data.content.join('\n')}`);
 
             const dmEmbed = new EmbedBuilder()
             .setTitle(`Strike Notification`)

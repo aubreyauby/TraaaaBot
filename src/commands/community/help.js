@@ -83,7 +83,6 @@ module.exports = {
 
         await interaction.deferReply({ ephemeral: true });
 
-        // Your logic for sending the welcome message and setting up the collector
         const initialMessage = await interaction.followUp({
             embeds: [welcomeEmbed],
             components: components(false),
@@ -101,14 +100,12 @@ module.exports = {
             const [directory] = interaction.values;
         
             if (directory === 'home') {
-                // If the user selected "Home," show the welcomeEmbed.
                 interaction.update({
                     embeds: [welcomeEmbed],
                     components: components(false),
                     ephemeral: true
                 });
             } else {
-                // If the user selected another category, show the commands for that category.
                 const categoryCommands = communityCommands.filter(cmd => cmd.category === directory);
         
                 const categoryEmbed = new EmbedBuilder()

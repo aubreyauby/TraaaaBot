@@ -1,5 +1,6 @@
-const { Client, Interaction, EmbedBuilder, ApplicationCommandOptionType, PermissionFlagsBits } = require('discord.js');
+const { Client, Interaction, EmbedBuilder, ApplicationCommandOptionType, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
 const Configure = require('../../models/configure');
+const configSessions = new Map();
 
 module.exports = {
     /**
@@ -10,7 +11,7 @@ module.exports = {
     callback: async (client, interaction) => {
         const commandName = interaction.commandName;
 
-        if (commandName === 'configure') {
+        if (commandName === 'config') {
             const modlogsOption = interaction.options.get('modlogs');
 
             if (!modlogsOption) {
@@ -20,11 +21,12 @@ module.exports = {
 
                 const helpEmbed = new EmbedBuilder()
                     .setColor(0xFF69B4)
+                    .setAuthor({ name: 'TraaaaBot Settings', iconURL: client.user.displayAvatarURL() })
                     .setTitle('Configure Settings for TraaaaBot')
                     .setDescription(`Configure the behavior and features of TraaaaBot in your server to make the bot function based on your needs and preferences. ` 
                         + `You can also change the settings easily without the need to run many commands by [using the dashboard](https://www.google.com).\n\n`
-                        + `**Usage:** \`/configure [category: choice]\`\n`
-                        + `**Example:** \`/configure modlogs: Enable\` (this will enable moderation logs for the server)`)
+                        + `**Usage:** \`/config [category: choice]\`\n`
+                        + `**Example:** \`/config modlogs: Enable\` (this will enable moderation logs for the server)`)
                     .setThumbnail(guildIconURL);
 
                 await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
@@ -50,12 +52,19 @@ module.exports = {
             const updatedConfigureDoc = await Configure.findOne({ userId, guildId });
             
             if (value === 1) {
-                const modlogEnableEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
-                .setDescription(':white_check_mark: Moderation logs have been **enabled** for this server.');
-            
+                // Enable logging and add audit log access information
+                const modlogEnableEmbed = new EmbedBuilder()
+                    .setColor(0x00FF00)
+                    .setTitle('Success')
+                    .setDescription(':white_check_mark: Moderation logs have been **enabled** for this server.')
+
                 updatedConfigureDoc.modlogIsEnabled = true;
                 await updatedConfigureDoc.save();
-            
+
+                if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
+                    modlogEnableEmbed.addFields({name: 'Missing Permission', value: `:warning: TraaaaBot lacks the **View Audit Log** permission. Server icon changes will not be logged until this permission is granted.`})
+                }
+
                 await interaction.reply({ embeds: [modlogEnableEmbed], ephemeral: true });
             } else if (value === 2) {
                 const modlogDisableEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
@@ -69,6 +78,7 @@ module.exports = {
                 const modlogSetChannelEmbed = new EmbedBuilder().setColor(0xCF9FFF).setTitle('Input Needed')
                     .setDescription(':question: Please specify the text channel that you want to use for logging in the next message.');
             
+                configSessions.set(`${userId}-${guildId}`, true);
                 const initialMessage = await interaction.reply({ embeds: [modlogSetChannelEmbed], ephemeral: true });
                 const filter = (response) => {
                     return response.channel.id === interaction.channelId && response.author.id === interaction.user.id;
@@ -84,13 +94,14 @@ module.exports = {
                         .setDescription(`:white_check_mark: Moderation logs will now be sent to ${mentionedChannel.toString()}.`);
                         
                         if (!updatedConfigureDoc.modlogIsEnabled) {
-                            successEmbed.addFields({name: 'Warning', value: ':warning: Moderation logs are currently **disabled**. Enable it with \`/configure modlogs: Enable\` to start logging to the channel.'})
+                            successEmbed.addFields({name: 'Warning', value: ':warning: Moderation logs are currently **disabled**. Enable it with \`/config modlogs: Enable\` to start logging to the channel.'})
                         }
                         
                         configureDoc.modlogChannel = mentionedChannel.id;
                         await configureDoc.save();
 
                         await interaction.editReply({ embeds: [successEmbed] });
+                        configSessions.delete(`${userId}-${guildId}`);
                         await response.delete();
                         collector.stop();
                     } else {
@@ -105,6 +116,7 @@ module.exports = {
                     if (reason === 'time') {
                         const timeoutEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle('Error')
                             .setDescription(':x: Configuration session timed out.');
+                            configSessions.delete(`${userId}-${guildId}`);
                         await interaction.editReply({ embeds: [timeoutEmbed], ephemeral: true });
                     }
                 });
@@ -113,31 +125,83 @@ module.exports = {
                 const pingRolesPromptEmbed = new EmbedBuilder()
                     .setColor(0xCF9FFF)
                     .setTitle('Input Needed')
-                    .setDescription(':question: Please mention or type the names of the roles that should be pinged for new members whose accounts are less than 14 days old in the next message.\n\nIf you are specifying multiple roles, you must use commas. e.g. `role 1, role 2`');
-                
+                    .setDescription(':question: Please mention or type the names of the roles that should be pinged for new members whose accounts are less than 14 days old in the next message.\n\nIf you are specifying multiple roles, you must use commas. e.g. `role 1, role 2`\n\n'
+                    + 'You can also type `clear` to clear the roles that are being used right now for pinging.'
+                    + '\n\nIf you no longer wish to do this, type `cancel`.');
+                                                
                 const initialMessage = await interaction.reply({ embeds: [pingRolesPromptEmbed], ephemeral: true });
+                configSessions.set(`${userId}-${guildId}`, true);
             
                 // Create a filter function to check for valid role mentions and role names
                 const roleMentionFilter = (response) => {
-                    const content = response.content.toLowerCase(); // Convert to lowercase for case-insensitivity
-                    if (content === 'disable') {
-                        // User wants to disable the feature, so remove pingRoles entry from the database
-                        configureDoc.pingRoles = [];
-                        configureDoc.save().then(() => {
-                            const successEmbed = new EmbedBuilder()
-                                .setColor(0x00FF00)
-                                .setTitle('Success')
-                                .setDescription(':white_check_mark: The roles ping feature has been disabled.');
-                            interaction.editReply({ embeds: [successEmbed], ephemeral: true }).then(() => {
+                    const content = response.content.toLowerCase();
+            
+                    if (content === 'cancel') {
+                        // User wants to cancel the configuration
+                        const cancelEmbed = new EmbedBuilder()
+                            .setColor(0xFF0000)
+                            .setTitle('Cancelled')
+                            .setDescription(':x: Configuration cancelled. No roles were added.');
+            
+                        interaction.editReply({ embeds: [cancelEmbed], ephemeral: true }).then(() => {
+                            if (!response.deleted) {
+                                response.delete();
+                            }
+                            configSessions.delete(`${userId}-${guildId}`);
+                        }).catch(error => {
+                            console.error("Error while deleting messages:", error);
+                            configSessions.delete(`${userId}-${guildId}`);
+                        });
+            
+                        collector.stop();
+                        return;
+                    }
+            
+                    if (content === 'clear') {
+                        // User wants to clear the specified roles
+                        const clearedRoles = configureDoc.pingRoles.map(roleId => {
+                            const role = interaction.guild.roles.cache.get(roleId);
+                            return role ? `<@&${role.id}>` : null;
+                        }).filter(Boolean);
+            
+                        if (clearedRoles.length === 0) {
+                            // No roles to clear
+                            const noRolesToClearEmbed = new EmbedBuilder()
+                                .setColor(0xFF0000)
+                                .setTitle('Error')
+                                .setDescription(':x: There are no roles to clear. The configuration window has closed.');
+            
+                            interaction.editReply({ embeds: [noRolesToClearEmbed], ephemeral: true }).then(() => {
                                 if (!response.deleted) {
                                     response.delete();
                                 }
+                                configSessions.delete(`${userId}-${guildId}`);
                             }).catch(error => {
                                 console.error("Error while deleting messages:", error);
+                                configSessions.delete(`${userId}-${guildId}`);
                             });
-                        }).catch(error => {
-                            console.error("Error while saving configuration:", error);
-                        });
+                        } else {
+                            configureDoc.pingRoles = [];
+                            configureDoc.save().then(() => {
+                                const successEmbed = new EmbedBuilder()
+                                    .setColor(0x00FF00)
+                                    .setTitle('Success')
+                                    .setDescription(`:white_check_mark: Successfully removed ${clearedRoles.join(', ')} from being pinged about new members who join with accounts less than 14 days old.`);
+            
+                                interaction.editReply({ embeds: [successEmbed], ephemeral: true }).then(() => {
+                                    if (!response.deleted) {
+                                        response.delete();
+                                    }
+                                    configSessions.delete(`${userId}-${guildId}`);
+                                }).catch(error => {
+                                    console.error("Error while deleting messages:", error);
+                                    configSessions.delete(`${userId}-${guildId}`);
+                                });
+                            }).catch(error => {
+                                console.error("Error while saving configuration:", error);
+                                configSessions.delete(`${userId}-${guildId}`);
+                            });
+                        }
                         collector.stop();
                         return;
                     }
@@ -181,19 +245,23 @@ module.exports = {
                             if (invalidRoles.length > 0) {
                                 successEmbed.addFields({
                                     name: 'Invalid Roles',
-                                    value: `The following roles were not added because they do not exist: \`${invalidRoles.join(', ')}\``
+                                    value: `:x: The following roles were not added because they do not exist: \`${invalidRoles.join(', ')}\``
                                 });
                             }
             
+                            configSessions.delete(`${userId}-${guildId}`);
+
                             interaction.editReply({ embeds: [successEmbed], ephemeral: true }).then(() => {
                                 if (!response.deleted) {
                                     response.delete();
                                 }
                             }).catch(error => {
                                 console.error("Error while deleting messages:", error);
+                                configSessions.delete(`${userId}-${guildId}`);
                             });
                         }).catch(error => {
                             console.error("Error while saving configuration:", error);
+                            configSessions.delete(`${userId}-${guildId}`);
                         });
             
                         collector.stop();
@@ -203,7 +271,7 @@ module.exports = {
                         const errorEmbed = new EmbedBuilder()
                             .setColor(0xFF0000)
                             .setTitle('Error')
-                            .setDescription(`:x: The following roles are invalid or do not exist: \`${invalidRolesList}\``);
+                            .setDescription(`:x: The following roles are invalid or do not exist: \`${invalidRolesList}\`\n\nTry again.`);
             
                         interaction.editReply({ embeds: [errorEmbed], ephemeral: true }).then(() => {
                             if (!response.deleted) {
@@ -211,6 +279,7 @@ module.exports = {
                             }
                         }).catch(error => {
                             console.error("Error while deleting messages:", error);
+                            configSessions.delete(`${userId}-${guildId}`);
                         });
                     }
                 }
@@ -228,6 +297,8 @@ module.exports = {
                             .setColor(0xFF0000)
                             .setTitle('Error')
                             .setDescription(':x: Configuration session timed out.');
+                            
+                            configSessions.delete(`${userId}-${guildId}`);
             
                         interaction.editReply({ embeds: [timeoutEmbed], ephemeral: true }).then(() => {
                             // Delete the initial message on timeout
@@ -236,6 +307,7 @@ module.exports = {
                             }
                         }).catch(error => {
                             console.error("Error while deleting messages:", error);
+                            configSessions.delete(`${userId}-${guildId}`);
                         });
                     }
                 });
@@ -251,10 +323,10 @@ module.exports = {
             type: ApplicationCommandOptionType.Integer,
             required: false,
             choices: [
-                { name: "Enable", value: 1 },
-                { name: "Disable", value: 2 },
-                { name: "Set channel", value: 3 },
-                { name: "Ping roles if an account is less than 14 days old", value: 4 },
+                { name: "Enable moderation logs for this server", value: 1 },
+                { name: "Disable moderation logs for this server", value: 2 },
+                { name: "Set a channel to post moderation logs", value: 3 },
+                { name: "Ping roles if a member joins with an account less than 14 days old", value: 4 },
             ],
         },
     ],
