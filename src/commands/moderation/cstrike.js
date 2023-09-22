@@ -22,11 +22,19 @@ module.exports = {
             userTag: target.tag
         });
 
+        if (target.bot) {
+            const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
+                .setDescription(`:x: <@${target.id}> is a bot.`)
+                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+            return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
+        }
+
+
         if (!userStrikes) {
             const noStrikesEmbed = {
                 color: 0xFF0000,
                 title: `Error`,
-                description: `❌ **${target.username}** (<@${target.id}>) does not have any strikes.`,
+                description: `❌ <@${target.id}> does not have any strikes.`,
                 thumbnail: {
                     url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                 }
@@ -49,7 +57,8 @@ module.exports = {
         const confirmEmbed = {
             color: 0xEED202,
             title: 'Warning',
-            description: `Are you sure you want to **clear** <@${target.id}>'s strikes? They will not be notified that their strikes were cleared from the server.\n\n<@${target.id}> currently has ${userStrikes.strikeCount === 1 ? '**1** strike' : `**${userStrikes.strikeCount}** strikes`}.\n\n**WAIT!** Are you looking to remove a specific strike only? Do \`/rstrike (user) (strike number)\` instead.`,
+            description: `:warning: Are you sure you want to clear <@${target.id}>'s strikes? They will not be notified that their strikes were cleared from the server.\n\n<@${target.id}> currently has ${userStrikes.strikeCount === 1 ? '**1** strike' : `**${userStrikes.strikeCount}** strikes`}.`,
+            footer: {text: 'Are you looking to remove a specific strike? The command is /rstrike.'},
             thumbnail: { url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }) }
         };
 
@@ -69,7 +78,7 @@ module.exports = {
                 const resultEmbed = {
                     color: 0x00ff00,
                     title: `Success`,
-                    description: `<@${target.id}>'s strikes have been cleared from this server.`,
+                    description: `:white_check_mark: <@${target.id}>'s strikes have been cleared from ${interaction.guild.name}.`,
                     thumbnail: {
                         url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                     }
@@ -83,7 +92,7 @@ module.exports = {
                 const cancelEmbed = {
                     color: 0x00ff00,
                     title: `Success`,
-                    description: `Clear strike operation for <@${target.id}> was cancelled.`,
+                    description: `:white_check_mark: Clear strike operation for <@${target.id}> was cancelled.`,
                     thumbnail: {
                         url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                     }
@@ -99,7 +108,7 @@ module.exports = {
                 const timeoutEmbed = {
                     color: 0xFF0000,
                     title: `Error`,
-                    description: `Strike clear confirmation timed out. <@${target.id}> will not have their strikes cleared from this server.`,
+                    description: `:x: Strike clear confirmation timed out. <@${target.id}> will not have their strikes cleared from this server.`,
                     thumbnail: {
                         url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
                     }
@@ -111,11 +120,11 @@ module.exports = {
     },
 
     name: 'cstrike',
-    description: "Clears the strikes of a user.",
+    description: "Clears the strikes of a member.",
     options : [
         {
             name: "user",
-            description: "The user you want to clear the strikes of.",
+            description: "The member you want to clear the strikes of.",
             type: ApplicationCommandOptionType.Mentionable,
             required: true
         }

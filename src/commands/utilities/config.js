@@ -13,12 +13,12 @@ module.exports = {
 
         if (commandName === 'config') {
             const modlogsOption = interaction.options.get('modlogs');
+            const lookoutOption = interaction.options.get('lookout');
 
-            if (!modlogsOption) {
-                // Handle the case where no arguments are provided (showing help)
+            if (!modlogsOption && !lookoutOption) {
                 const guild = interaction.guild;
                 const guildIconURL = guild.iconURL();
-
+            
                 const helpEmbed = new EmbedBuilder()
                     .setColor(0xFF69B4)
                     .setAuthor({ name: 'TraaaaBot Settings', iconURL: client.user.displayAvatarURL() })
@@ -28,12 +28,13 @@ module.exports = {
                         + `**Usage:** \`/config [category: choice]\`\n`
                         + `**Example:** \`/config modlogs: Enable\` (this will enable moderation logs for the server)`)
                     .setThumbnail(guildIconURL);
-
+            
                 await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
                 return;
             }
 
-            const value = modlogsOption.value;
+            const modlogsValue = modlogsOption ? modlogsOption.value : null;
+            const lookoutValue = lookoutOption ? lookoutOption.value : null;
 
             const userId = interaction.user.id;
             const guildId = interaction.guild.id;
@@ -51,7 +52,7 @@ module.exports = {
 
             const updatedConfigureDoc = await Configure.findOne({ userId, guildId });
             
-            if (value === 1) {
+            if (modlogsValue === 1) {
                 // Enable logging and add audit log access information
                 const modlogEnableEmbed = new EmbedBuilder()
                     .setColor(0x00FF00)
@@ -66,7 +67,7 @@ module.exports = {
                 }
 
                 await interaction.reply({ embeds: [modlogEnableEmbed], ephemeral: true });
-            } else if (value === 2) {
+            } else if (modlogsValue === 2) {
                 const modlogDisableEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
                 .setDescription(':white_check_mark: Moderation logs have been **disabled** for this server.');
             
@@ -74,7 +75,7 @@ module.exports = {
                 await Configure.findOneAndDelete({ userId: interaction.user.id, guildId: interaction.guild.id });
             
                 await interaction.reply({ embeds: [modlogDisableEmbed], ephemeral: true });
-            } else if (value === 3) {
+            } else if (modlogsValue === 3) {
                 const modlogSetChannelEmbed = new EmbedBuilder().setColor(0xCF9FFF).setTitle('Input Needed')
                     .setDescription(':question: Please specify the text channel that you want to use for logging in the next message.');
             
@@ -120,7 +121,7 @@ module.exports = {
                         await interaction.editReply({ embeds: [timeoutEmbed], ephemeral: true });
                     }
                 });
-            } else if (value === 4) {
+            } else if (modlogsValue === 4) {
                 // Ask the user to ping or mention the roles
                 const pingRolesPromptEmbed = new EmbedBuilder()
                     .setColor(0xCF9FFF)
@@ -311,7 +312,58 @@ module.exports = {
                         });
                     }
                 });
-            }                                                                                                                                                                                     
+            } else if (lookoutValue === 5) {
+                const lookoutSetChannelEmbed = new EmbedBuilder().setColor(0xCF9FFF).setTitle('Input Needed')
+                    .setDescription(':question: Please specify the text channel where you want to post lookout logs in the next message.');
+            
+                configSessions.set(`${userId}-${guildId}`, true);
+                const initialMessage = await interaction.reply({ embeds: [lookoutSetChannelEmbed], ephemeral: true });
+                const filter = (response) => {
+                    return response.channel.id === interaction.channelId && response.author.id === interaction.user.id;
+                };
+            
+                const collector = interaction.channel.createMessageCollector({ filter, time: 60000 });
+            
+                collector.on('collect', async (response) => {
+                    const mentionedChannel = response.mentions.channels.first();
+            
+                    if (mentionedChannel) {
+                        const successEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
+                            .setDescription(`:white_check_mark: Lookout logs will now be sent to ${mentionedChannel.toString()}.`);
+            
+                        try {
+                            const configureDoc = await Configure.findOneAndUpdate(
+                                { userId, guildId },
+                                { lookoutLogChannel: mentionedChannel.id },
+                                { new: true }
+                            );
+            
+                            await configureDoc.save();
+                        } catch (error) {
+                            console.error(`Error updating lookoutLogChannel: ${error}`);
+                        }
+            
+                        await interaction.editReply({ embeds: [successEmbed] });
+                        configSessions.delete(`${userId}-${guildId}`);
+                        await response.delete();
+                        collector.stop();
+                    } else {
+                        const invalidChannelEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle('Error')
+                            .setDescription(':x: Please mention a valid text channel to set as the lookout logs channel.');
+                        await interaction.editReply({ embeds: [invalidChannelEmbed], ephemeral: true });
+                        await response.delete();
+                    }
+                });
+            
+                collector.on('end', async (reason) => {
+                    if (reason === 'time') {
+                        const timeoutEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle('Error')
+                            .setDescription(':x: Configuration session timed out.');
+                        configSessions.delete(`${userId}-${guildId}`);
+                        await interaction.editReply({ embeds: [timeoutEmbed], ephemeral: true });
+                    }
+                });
+            }                                                                                                                                                                                             
         }
     },
     name: "config",
@@ -328,6 +380,15 @@ module.exports = {
                 { name: "Set a channel to post moderation logs", value: 3 },
                 { name: "Ping roles if a member joins with an account less than 14 days old", value: 4 },
             ],
+        },
+        {
+            name: "lookout",
+            description: "Log more activities about a specified member in the server.",
+            type: ApplicationCommandOptionType.Integer,
+            required: false,
+            choices: [
+                { name: "Set a channel to post lookout logs", value: 5 },
+            ]
         },
     ],
     permissionsRequired: [PermissionFlagsBits.ManageGuild],

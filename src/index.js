@@ -6,9 +6,9 @@ const configJSON = require('../config.json');
 const Ban = require('./models/ban');
 const clear = require('clear-console');
 const Configure = require('./models/configure');
-const { joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
-
-// Clear anything that was displayed on the console before.
+const { joinVoiceChannel } = require('@discordjs/voice');
+const Lookout = require('./models/lookout');
+const lookoutStatus = {};
 clear();
 
 // Switch this between true and false if the host machine is connected to a network that is blacklisted
@@ -30,16 +30,15 @@ const client = new Client({
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildInvites,
+    IntentsBitField.Flags.GuildPresences,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.MessageContent,
-    IntentsBitField.Flags.GuildVoiceStates,
-    IntentsBitField.Flags.GuildMessageReactions
+    IntentsBitField.Flags.GuildVoiceStates
   ],
 });
 
 // This is responsible for TraaaaBot Music.
 client.queue = new Map();
-const configSessions = new Map();
 
 // Define the colors of the trans flag (blue, pink, and white)
 const transFlagColors = [
@@ -102,7 +101,7 @@ const serverConfigs = {};
             }
           }
         } catch (error) {
-          console.error('Error checking for expired bans:', error);
+          console.error('\x1b[1;91mERROR \x1b[0;91mError checking for expired bans:', error);
         }
       }, checkInterval);
 
@@ -149,7 +148,10 @@ const serverConfigs = {};
     // Logging: Deleted Messages
     client.on('messageDelete', async (deletedMessage) => {
       try {
-        if (deletedMessage.author.id === client.user.id) return;
+        if (deletedMessage.author.id === client.user.id) {
+          // Exclude messages deleted by the bot (configuration messages)
+          return;
+        }
     
         const serverId = deletedMessage.guild.id;
         const config = await Configure.findOne({ guildId: serverId });
@@ -162,7 +164,7 @@ const serverConfigs = {};
             .setDescription(`**Content:** ${deletedMessage.content}\n\n`)
             .setTimestamp()
             .setFooter({ text: `Message ID: ${deletedMessage.id} | Sender ID: ${deletedMessage.author.id}` });
-    
+
           if (deletedMessage.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             try {
               const auditLogs = await deletedMessage.guild.fetchAuditLogs({ type: AuditLogEvent.MessageDelete });
@@ -174,16 +176,16 @@ const serverConfigs = {};
               }
             }
           }
-    
+
           const modlogChannel = deletedMessage.guild.channels.cache.get(config.modlogChannel);
           if (modlogChannel) {
             modlogChannel.send({ embeds: [messageDeleteEmbed] });
           }
         }
       } catch (error) {
-        console.error('Error in messageDelete event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in messageDelete event:', error);
       }
-    });      
+    });
 
     // Logging: Nickname changes
     client.on('guildMemberUpdate', async (oldMember, newMember) => {
@@ -193,7 +195,6 @@ const serverConfigs = {};
 
         if (config && config.modlogChannel && config.modlogIsEnabled) {
           if (oldMember.displayName !== newMember.displayName) {
-            // Nickname change
             const nicknameChangeEmbed = new EmbedBuilder()
               .setColor(0xFF69B4)
               .setTitle('Nickname changed')
@@ -221,8 +222,41 @@ const serverConfigs = {};
           }
         }
       } catch (error) {
-        console.error('Error in guildMemberUpdate event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in guildMemberUpdate event:', error);
       }
+    });
+
+    // Logging: Server profile picture changes
+    client.on('guildMemberUpdate', async (oldMember, newMember) => {
+      if (oldMember.avatarURL() === newMember.avatarURL()) {
+          console.log("User didn't changed avatar");
+      } else {
+        const serverIds = client.guilds.cache.map(guild => guild.id);
+        const configPromises = serverIds.map(guildId => Configure.findOne({ guildId }));
+    
+        const configArray = await Promise.all(configPromises);
+    
+        for (let i = 0; i < serverIds.length; i++) {
+          const serverId = serverIds[i];
+          const config = configArray[i];
+    
+          if (config && config.modlogChannel && config.modlogIsEnabled) {
+            const profilePictureChangeEmbed = new EmbedBuilder()
+              .setColor(0xFF69B4)
+              .setTitle(`Server-Specific Avatar Changed`)
+              .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
+              .setThumbnail(newMember.avatarURL())
+              .setDescription(`<@${newMember.user.id}> changed their avatar specifically for ${newMember.guild.name}.`)
+              .setTimestamp()
+              .setFooter({ text: `User ID: ${newMember.user.id}` });
+    
+            const modlogChannel = client.guilds.cache.get(serverId)?.channels.cache.get(config.modlogChannel);
+            if (modlogChannel) {
+              modlogChannel.send({ embeds: [profilePictureChangeEmbed] });
+            }
+          }
+        }
+      };
     });
 
     // Logging: Role changes (added and removed)
@@ -235,16 +269,13 @@ const serverConfigs = {};
           const addedRoles = newMember.roles.cache.filter((role) => !oldMember.roles.cache.has(role.id));
           const removedRoles = oldMember.roles.cache.filter((role) => !newMember.roles.cache.has(role.id));
 
-          // Check for roles that were added but are not present in the GuildMember's roles collection
           if (addedRoles.size > 0) {
             addedRoles.forEach(async (role) => {
-              const rolesAddedEmbed = new EmbedBuilder()
-                .setColor(0x3498db)
-                .setTitle('Role Added')
+              const rolesAddedEmbed = new EmbedBuilder().setColor(0x3498db).setTitle('Role Added')
                 .setDescription(`Role added to <@${newMember.id}>: ${role.toString()}`)
-                .setTimestamp()
                 .setFooter({ text: `User ID: ${newMember.id}` })
-                .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() });
+                .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() })
+                .setTimestamp();
 
               if (newMember.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
                 try {
@@ -253,25 +284,19 @@ const serverConfigs = {};
                   rolesAddedEmbed.addFields({ name: 'Updated By', value: `<@${auditLogEntry.executor.id}>` });
                 } catch (error) {
                   console.error(error);
-                  if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) {
-                    return;
-                  }
+                  if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) { return; }
                 }
               }
 
               const modlogChannel = newMember.guild.channels.cache.get(config.modlogChannel);
-              if (modlogChannel) {
-                modlogChannel.send({ embeds: [rolesAddedEmbed] });
-              }
+              if (modlogChannel) { modlogChannel.send({ embeds: [rolesAddedEmbed] }); }
             });
           }
 
           if (removedRoles.size > 0) {
             const removedRolesNames = removedRoles.map((role) => role.toString()).join(', ');
-            const rolesRemovedEmbed = new EmbedBuilder()
-              .setColor(0xEE4B2B)
-              .setTitle('Roles Removed')
-              .setDescription(`Roles removed from <@${newMember.id}>: ${removedRolesNames}`)
+            const rolesRemovedEmbed = new EmbedBuilder().setColor(0xEE4B2B).setTitle('Role Removed')
+              .setDescription(`Role removed from <@${newMember.id}>: ${removedRolesNames}`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.id}` })
               .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() });
@@ -283,20 +308,16 @@ const serverConfigs = {};
                 rolesRemovedEmbed.addFields({ name: 'Updated By', value: `<@${auditLogEntry.executor.id}>` });
               } catch (error) {
                 console.error(error);
-                if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) {
-                  return;
-                }
+                if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) { return; }
               }
             }
 
             const modlogChannel = newMember.guild.channels.cache.get(config.modlogChannel);
-            if (modlogChannel) {
-              modlogChannel.send({ embeds: [rolesRemovedEmbed] });
-            }
+            if (modlogChannel) { modlogChannel.send({ embeds: [rolesRemovedEmbed] }); }
           }
         }
       } catch (error) {
-        console.error('Error in guildMemberUpdate event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in guildMemberUpdate event:', error);
       }
     });
 
@@ -331,7 +352,7 @@ const serverConfigs = {};
             }).filter(Boolean);
 
             if (pingedRoles.length > 0 && modlogChannel) {
-              const rolesMessage = pingedRoles.join(' '); // Join roles into a single string
+              const rolesMessage = pingedRoles.join(' ');
               modlogChannel.send(`:warning: Hey ${rolesMessage}, watch out! **${member.user.tag}** (<@${member.user.id}>) joined with an account less than two weeks old!`);
             }
           }
@@ -419,7 +440,7 @@ const serverConfigs = {};
           }
         }
       } catch (error) {
-        console.error('Error in channelCreate event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in channelCreate event:', error);
       }
     });
     
@@ -476,14 +497,14 @@ const serverConfigs = {};
           }
         }
       } catch (error) {
-        console.error('Error in channelDelete event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in channelDelete event:', error);
       }
     });    
 
     // Logging: Profile picture changes
     client.on('userUpdate', async (oldUser, newUser) => {
       if (oldUser.avatar !== newUser.avatar) {
-        const serverIds = client.guilds.cache.map(guild => guild.id); // Use client.guilds.cache
+        const serverIds = client.guilds.cache.map(guild => guild.id);
         const configPromises = serverIds.map(guildId => Configure.findOne({ guildId }));
     
         const configArray = await Promise.all(configPromises);
@@ -518,7 +539,6 @@ const serverConfigs = {};
           const config = await Configure.findOne({ guildId: newGuild.id });
   
           if (config && config.modlogChannel && config.modlogIsEnabled) {
-              // Find the audit logs for the guild
               const auditLogs = await newGuild.fetchAuditLogs({ type: AuditLogEvent.GuildUpdate });
               const auditLogEntry = auditLogs.entries.first();
   
@@ -566,7 +586,7 @@ const serverConfigs = {};
           }
         }
       } catch (error) {
-        console.error('Error in inviteCreate event:', error);
+        console.error('\x1b[1;91mERROR \x1b[0;91mError in inviteCreate event:', error);
       }
     });
 
@@ -577,13 +597,8 @@ const serverConfigs = {};
         const config = await Configure.findOne({ guildId: serverId });
     
         if (config && config.modlogChannel && config.modlogIsEnabled) {
-          const inviteDeleteEmbed = new EmbedBuilder()
-            .setColor(0xFF0000) // Red color for invite revocation
-            .setTitle('Invite Deleted')
-            .setAuthor({
-              name: invite.inviter ? invite.inviter.tag : 'Unknown',
-              iconURL: invite.inviter && invite.inviter.displayAvatarURL() ? invite.inviter.displayAvatarURL() : null
-            })
+          const inviteDeleteEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle('Invite Deleted')
+            .setAuthor({name: invite.inviter ? invite.inviter.tag : 'Unknown', iconURL: invite.inviter && invite.inviter.displayAvatarURL() ? invite.inviter.displayAvatarURL() : null})
             .setDescription(`**Channel:** <#${invite.channel.id}>\n**Invite Code:** ${invite.code}`)
     
           const botMember = invite.guild.members.cache.get(client.user.id);
@@ -595,14 +610,9 @@ const serverConfigs = {};
                 inviteDeleteEmbed.addFields({ name: 'Deleted by', value: `<@${auditLogEntry.executor.id}>` });
                 inviteDeleteEmbed.setAuthor({ name: auditLogEntry.executor.tag, iconURL: auditLogEntry.executor.avatarURL() })
               }
-            } catch (error) {
-              if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) {
-                return;
-              }
-            }
+            } catch (error) { if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) { return; } }
           }
     
-          // Set the timestamp and send the embed to the modlog channel
           inviteDeleteEmbed.setTimestamp();
           const modlogChannel = invite.guild.channels.cache.get(config.modlogChannel);
           if (modlogChannel) {
@@ -610,17 +620,151 @@ const serverConfigs = {};
           }
         }
       } catch (error) {
-        console.error('Error in inviteDelete event:', error);
+        console.error('E\x1b[1;91mERROR \x1b[0;91mError in inviteDelete event:', error);
       }
     });
-       
+
+    client.on('presenceUpdate', async (oldPresence, newPresence) => {
+      // Check if oldPresence and newPresence are not null
+      if (!oldPresence || !newPresence) {
+        return;
+      }
     
-    } else { console.log(`\x1b[1;31mERROR \x1b[0mAttempts to connect to the MongoDB database have been disabled.`); }
+      const userId = newPresence.member.id;
+    
+      try {
+        // Fetch user's lookout status from the database
+        const lookoutUser = await Lookout.findOne({ userID: userId });
+    
+        if (lookoutUser && lookoutUser.lookOutEnabled && oldPresence.status !== newPresence.status) {
+          const serverId = newPresence.guild.id;
+    
+          const config = await Configure.findOne({ guildId: serverId });
+    
+          if (config && config.lookoutLogChannel && config.modlogIsEnabled) {
+            let statusEmoji = '';
+            let status = newPresence.status.charAt(0).toUpperCase() + newPresence.status.slice(1);
+    
+            switch (newPresence.status) {
+              case 'online':
+                statusEmoji = '🟢';
+                break;
+              case 'idle':
+                statusEmoji = '🟡';
+                break;
+              case 'dnd':
+                statusEmoji = '🔴';
+                status = 'Do Not Disturb';
+                break;
+              case 'offline':
+                statusEmoji = '⚫';
+                break;
+              default:
+                statusEmoji = '❓';
+            }
+    
+            const statusChangeEmbed = {
+              color: 0xFF0000,
+              title: 'Lookout Advisory - Status Change',
+              description: `‼️ <@${userId}> is now ${statusEmoji} **${status}**.`,
+              timestamp: new Date(),
+              footer: { text: `User ID: ${userId}` },
+            };
+    
+            const lookoutLogChannelId = config.lookoutLogChannel;
+            const lookoutLogChannel = newPresence.guild.channels.cache.get(lookoutLogChannelId);
+    
+            if (lookoutLogChannel) {
+              lookoutLogChannel.send({ embeds: [statusChangeEmbed] });
+            } else {
+              console.error('Lookout log channel not found.');
+            }
+          } else {
+            console.error('Config or modlogIsEnabled not met.');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching lookout status from the database:', error);
+      }
+    });
+
+    client.on('voiceStateUpdate', async (oldState, newState) => {
+      const userId = newState.member.id;
+      const serverId = newState.guild.id;
+    
+      try {
+        // Fetch user's lookout status from the database
+        const lookoutUser = await Lookout.findOne({ userID: userId });
+    
+        if (!lookoutUser || !lookoutUser.lookOutEnabled) {
+          return; // If the user isn't on lookout, exit early
+        }
+    
+        const config = await Configure.findOne({ guildId: serverId });
+    
+        if (config && config.lookoutLogChannel) {
+          const lookoutLogChannel = newState.guild.channels.cache.get(config.lookoutLogChannel);
+    
+          if (lookoutLogChannel) {
+            if (!oldState.channelId && newState.channelId) {
+              // User joined a voice channel for the first time
+              const joinChannel = newState.channel ? `<#${newState.channelId}>` : 'N/A';
+    
+              const joinEmbed = {
+                color: 0xFF0000,
+                title: 'Lookout Advisory - Joined Voice Channel',
+                description: `‼️ <@${userId}> joined a voice channel: ${joinChannel}`,
+                timestamp: new Date(),
+                footer: { text: `User ID: ${userId}` },
+              };
+    
+              lookoutLogChannel.send({ embeds: [joinEmbed] }).catch(console.error);
+            } else if (oldState.channelId && !newState.channelId) {
+              // User left a voice channel
+              const leaveChannel = oldState.channel ? `<#${oldState.channelId}>` : 'N/A';
+    
+              const leaveEmbed = {
+                color: 0xFF0000,
+                title: 'Lookout Advisory - Left Voice Channel',
+                description: `‼️ <@${userId}> left a voice channel: ${leaveChannel}`,
+                timestamp: new Date(),
+                footer: { text: `User ID: ${userId}` },
+              };
+    
+              lookoutLogChannel.send({ embeds: [leaveEmbed] }).catch(console.error);
+            } else if (oldState.channelId !== newState.channelId) {
+              // User switched voice channels
+              const oldChannel = oldState.channel ? `<#${oldState.channelId}>` : 'N/A';
+              const newChannel = newState.channel ? `<#${newState.channelId}>` : 'N/A';
+    
+              // Check if both old and new channels are not 'N/A' before logging
+              if (oldChannel !== 'N/A' && newChannel !== 'N/A') {
+                const switchEmbed = {
+                  color: 0xFF0000,
+                  title: 'Lookout Advisory - Switched Voice Channel',
+                  description: `‼️ <@${userId}> switched from ${oldChannel} to ${newChannel}.`,
+                  timestamp: new Date(),
+                  footer: { text: `User ID: ${userId}` },
+                };
+    
+                lookoutLogChannel.send({ embeds: [switchEmbed] }).catch(console.error);
+              }
+            }
+          } else {
+            console.error('Lookout log channel not found.');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching lookout status from the database:', error);
+      }
+    });
+        
+    } else { console.log('\x1b[1;91mERROR \x1b[0;91mAttempts to connect to the MongoDB database have been disabled.\x1b[0m'); }
 
     eventHandler(client);
     client.login(process.env.TOKEN);
 
-  } catch (error) { console.error('Error:', error); }
+  } catch (error) { console.error(`\x1b[1;91mERROR \x1b[0;91m ${error}`); }
 })();
 
 function ordinalSuffix(number) {

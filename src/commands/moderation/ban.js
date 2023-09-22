@@ -226,14 +226,14 @@ module.exports = {
     description: "Ban a member from the server.",
     options: [
         {
-            name: "user",
-            description: "Specify the user you want to ban from the server.",
+            name: "member",
+            description: "Specify the member you want to ban from the server.",
             type: ApplicationCommandOptionType.User,
             required: true,
         },
         {
             name: "reason",
-            description: "Specify a reason for why the user is being banned.",
+            description: "Specify a reason for why the member is being banned.",
             type: ApplicationCommandOptionType.String,
             required: false,
         },

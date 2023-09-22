@@ -1,72 +1,70 @@
-const {
-    ApplicationCommandOptionType,
-    PermissionFlagsBits,
-    PermissionsBitField,
-    EmbedBuilder
-} = require('discord.js');
-const LookoutUser = require ('../../models/lookout')
-
-// Maintain a Set to keep track of users on the lookout list
-const lookoutUsers = new Set();
+const { ApplicationCommandOptionType, PermissionFlagsBits, EmbedBuilder, Constants } = require('discord.js');
+const Configure = require('../../models/configure');
+const Lookout = require('../../models/lookout');
 
 module.exports = {
-  /**
-   * 
-   * @param {Client} client 
-   * @param {Interaction} interaction
-   */
     callback: async (client, interaction) => {
-        const noPermission = new EmbedBuilder()
-            .setColor(0xFF0000)
-            .setDescription(`❌ You do not have permission to use this command.`);
+        const { options, guildId, user } = interaction;
+        const target = options.getUser('member');
 
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-            return await interaction.reply({ embeds: [noPermission], ephemeral: true });
+        if (target.bot) {
+            const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
+                .setDescription(`:x: <@${target.id}> is a bot.`)
+                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+            return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
         }
 
-        const { options } = interaction;
-        const type = interaction.options.getString("type");
-        const target = options.getUser('user');
+        try {
+            // Check if the target user is already on the lookout list for this guild
+            const lookoutEntry = await Lookout.findOne({ guildID: guildId, userID: target.id });
 
-        if (type === 'add') {
-            const existingUser = await LookoutUser.findOne({ userID: target.id });
+            if (lookoutEntry) {
+                // Toggle lookout status
+                lookoutEntry.lookOutEnabled = !lookoutEntry.lookOutEnabled;
+                await lookoutEntry.save();
 
-            await LookoutUser.create({
-                guildID: interaction.guild.id,
+                const action = lookoutEntry.lookOutEnabled ? 'added to' : 'removed from';
+
+                // Send a confirmation message
+                const successEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
+                    .setDescription(`:white_check_mark: <@${target.id}> has been ${action} the lookout list.`)
+                    .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+
+                return await interaction.reply({ embeds: [successEmbed] });
+            }
+
+            // Get the guild's configuration
+            const configureDoc = await Configure.findOne({ guildId });
+
+            if (!configureDoc || !configureDoc.lookoutLogChannel) {
+                const configMissingEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
+                    .setDescription(`:x: Lookout configuration is missing or incomplete for this guild.`);
+
+                return await interaction.reply({ embeds: [configMissingEmbed], ephemeral: true });
+            }
+
+            // Create a new entry in the lookout database
+            const newLookoutEntry = new Lookout({
+                guildID: guildId,
                 userID: target.id,
                 userTag: target.tag,
-                lookOutEnabled: true
+                lookOutEnabled: true,
             });
 
-            if (existingUser) {
-                return await interaction.reply({
-                    embeds: [new EmbedBuilder().setColor(0xFF0000).setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-                    .setTitle("Error").setDescription(`❌ **${target.username}** (<@${target.id}>) is already on the lookout list.`)],
-                    ephemeral: true
-                });
-            }
+            await newLookoutEntry.save();
 
-            await interaction.reply({
-                embeds: [new EmbedBuilder().setColor(0x5cb85c).setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-               .setTitle("Success").setDescription(`✅ **${target.tag}** (<@${target.id}>) has been added to the lookout list.`)],
-               ephemeral: true
-            });
-        } else if (type === 'remove') {
-            const existingUser = await LookoutUser.findOneAndDelete({ userID: target.id });
+            // Send a confirmation message
+            const successEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
+                .setDescription(`:white_check_mark: <@${target.id}> has been added to the lookout list.`)
+                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
 
-            if (existingUser === null) {
-                return await interaction.reply({
-                    embeds: [new EmbedBuilder().setColor(0xFF0000).setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-                    .setTitle("Error").setDescription(`❌ **${target.username}** (<@${target.id}>) is not on the lookout list.`)],
-                    ephemeral: true
-                });
-            } else {
-                return await interaction.reply({
-                    embeds: [new EmbedBuilder().setColor(0x5cb85c).setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-                    .setTitle("Success").setDescription(`✅ **${target.tag}** (<@${target.id}>) has been removed from the lookout list.`)],
-                    ephemeral: true
-                });
-            }
+            await interaction.reply({ embeds: [successEmbed] });
+        } catch (error) {
+            console.error(`Error toggling user lookout status: ${error}`);
+            const errorEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
+                .setDescription(`An error occurred while toggling <@${target.id}>'s lookout status.`);
+
+            await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
     },
 
@@ -74,28 +72,12 @@ module.exports = {
     description: "Sends out advisories to a specified text channel about a member's activity.",
     options: [
         {
-            name: "type",
-            description: "Choose whether to add or remove a member from lookout.",
-            type: ApplicationCommandOptionType.String,
-            required: true,
-            choices: [
-                {
-                    name: "add",
-                    value: "add"
-                },
-                {
-                    name: "remove",
-                    value: "remove"
-                }
-            ]
-        },
-        {
             name: "member",
-            description: "The member to place on lookout.",
+            description: "The member to place on or lift lookout from.",
             type: ApplicationCommandOptionType.Mentionable,
-            required: true
+            required: true,
         }
     ],
     permissionsRequired: [PermissionFlagsBits.ManageMessages],
-    botPermissions: [PermissionFlagsBits.ManageMessages]
-}
+    botPermissions: [PermissionFlagsBits.ManageMessages],
+};

@@ -123,14 +123,14 @@ module.exports = {
   description: "Kick a member from the server.",
   options: [
       {
-          name: "user",
-          description: "Specify the user you want to kick from the server.",
+          name: "member",
+          description: "Specify the member you want to kick from the server.",
           type: ApplicationCommandOptionType.User,
           required: true,
       },
       {
           name: "reason",
-          description: "Specify a reason for why the user is being kicked.",
+          description: "Specify a reason for why the member is being kicked.",
           type: ApplicationCommandOptionType.String,
           required: false,
       },

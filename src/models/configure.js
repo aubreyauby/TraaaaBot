@@ -22,6 +22,10 @@ const configureSchema = new Schema({
         required: false,
         default: [],
     },
+    lookoutLogChannel: {
+        type: String,
+        required: false,
+    }
 });
 
 

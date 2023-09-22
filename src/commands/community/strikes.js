@@ -12,7 +12,7 @@ module.exports = {
      */
     callback: async (client, interaction) => {
         const { options, member, guildId } = interaction;
-        const target = options.getUser('user') || member.user;
+        const target = options.getUser('member') || member.user;
         const invoker = member.user;
         let data = await strikeSchema.findOne({
             guildID: guildId,
@@ -20,21 +20,26 @@ module.exports = {
             userTag: target.tag,
         });
 
+        if (target.bot) {
+            const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
+                .setDescription(`:x: <@${target.id}> is a bot.`)
+                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+            return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
+        }
+
         const noStrikes = new EmbedBuilder()
             .setTitle(`${target.tag}'s Strike Logs`)
             .setColor(0x00FF00)
             .setTimestamp()
             .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
             .setDescription(`✅ <@${target.id}> has no strikes!\n\nThank you for following the rules.`)
+            .setFooter({text: `User ID: ${target.id}`})
             
         const viewYourOwn = new EmbedBuilder()
             .setColor(0xFF0000)
             .setDescription(`❌ You do not have permission to view the strike logs of other members.`)
 
-        if (target.id !== invoker.id && !member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-            interaction.reply({ embeds: [viewYourOwn] })
-            return;
-        }
+        if (target.id !== invoker.id && !member.permissions.has(PermissionsBitField.Flags.ManageMessages)) { return interaction.reply({ embeds: [viewYourOwn] }); }
 
         if (data) {
             const embed = new EmbedBuilder()
