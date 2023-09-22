@@ -304,6 +304,12 @@ module.exports = {
       stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/Waxq07logo.png/300px-Waxq07logo.png",
       countryCode: "US",
       ownerName: "iHeartMedia",
+    },
+    kalx: {
+      streamUrl: "https://stream.kalx.berkeley.edu:8443/kalx-128.mp3",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/2/2a/KALX_%28FM%29_logo.png",
+      countryCode: "US",
+      ownerName: "University of California",
     }
   };
   
