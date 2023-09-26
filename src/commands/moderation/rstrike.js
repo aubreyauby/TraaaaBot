@@ -34,9 +34,10 @@ module.exports = {
             const errorEmbed = {
                 color: 0xFF0000,
                 title: `Error`,
-                description: `❌ There was an issue removing the strike for <@${target.id}>. Please provide a valid strike number and try again later.`,
-                thumbnail: {
-                    url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                description: `❌ <@${target.id}> does not have a strike **${strikeNumber}** on their records for this server.`,
+                author: {
+                    name: target.tag, 
+                    iconURL: target.avatarURL()
                 }
             };
             return await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
@@ -49,9 +50,10 @@ module.exports = {
         const successEmbed = {
             color: 0x5cb85c,
             title: `Success`,
-            description: `✅ Removed strike **${strikeNumber}** for <@${target.id}>.\n\n:warning: If you removed the strike from the member during their timeout period, the timeout was not lifted. You would have to manually remove it from the member. `,
-            thumbnail: {
-                url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+            description: `✅ Removed strike **${strikeNumber}** for <@${target.id}>.\n\n:warning: Any action(s) taken with this strike were not reversed. You would have to manually reverse it yourself.`,
+            author: {
+                name: target.tag, 
+                iconURL: target.avatarURL()
             }
         };
 

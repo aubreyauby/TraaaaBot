@@ -1,5 +1,6 @@
 const stopDialog = document.getElementById('stop-dialog');
 const offlineDialog = document.getElementById('offline-dialog');
+const botcrashDialog = document.getElementById('bot-crash-dialog');
 
 const startBotButton = document.getElementById("startBotButton");
 const stopBotButton = document.getElementById("stopBotButton");

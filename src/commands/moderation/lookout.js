@@ -74,7 +74,7 @@ module.exports = {
         {
             name: "member",
             description: "The member to place on or lift lookout from.",
-            type: ApplicationCommandOptionType.Mentionable,
+            type: ApplicationCommandOptionType.User,
             required: true,
         }
     ],

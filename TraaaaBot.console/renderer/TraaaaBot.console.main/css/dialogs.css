@@ -1,31 +1,6 @@
-#blacklist-ip-dialog {
-    position: fixed;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-}
-
-#stop-dialog {
-    position: fixed;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-}
-
+#blacklist-ip-dialog,
+#stop-dialog,
+#bot-crash-dialog,
 #offline-dialog {
     position: fixed;
     top: -100%;

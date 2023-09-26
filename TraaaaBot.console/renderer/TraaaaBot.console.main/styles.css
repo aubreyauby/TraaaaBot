@@ -22,7 +22,7 @@ h1, p {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 160px); /* Adjust the height to create space for buttons and terminal */
+  height: calc(100vh - 160px);
   flex-direction: column;
 }
 
@@ -32,10 +32,10 @@ h1, p {
 
 /* Terminal Container */
 #container {
-  flex-grow: 1; /* This makes the terminal container take up remaining space */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  margin-top: 20px; /* Add margin at the top to create space for buttons */
+  margin-top: 20px;
 }
 
 #terminal {
@@ -52,25 +52,24 @@ h1, p {
   max-width: 100% !important;
 }
 
-/* Button Container */
 #button-container {
   display: flex;
-  justify-content: space-between; /* Stretch to ends of each side */
-  width: calc(100% - 40px); /* Use full width with 10px padding on each side */
-  margin-top: auto; /* Move the button container to the bottom */
-  margin-left: 20px; /* Add 10px left padding */
-  margin-right: 20px; /* Add 10px right padding */
+  justify-content: space-between;
+  width: calc(100% - 40px);
+  margin-top: auto;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 /* Start Button */
 #startBotButton,
 #stopBotButton,
 #settingsButton {
-  border: 2px solid transparent; /* Update common button styles */
+  border: 2px solid transparent;
   background-color: transparent;
-  width: auto; /* Allow the button to adjust its width based on content */
-  margin-right: auto; /* Move the Start button to the far left */
-  margin-left: 0; /* Reset margin for Start button */
+  width: auto;
+  margin-right: auto;
+  margin-left: 0;
   font-family: "Roboto", sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
   cursor: pointer;
@@ -103,16 +102,16 @@ h1, p {
 #stopBotButton {
   border: 2px solid #bb0000;
   color: #bb0000;
-  display: none; /* Initially hide the Stop button */
+  display: none;
 }
 
 /* Settings Button */
 #settingsButton {
   border: 2px solid #0091ff;
   color: #0091ff;
-  width: auto; /* Allow the button to adjust its width based on content */
-  margin-left: auto; /* Move the Settings button to the far right */
-  margin-right: 0; /* Reset margin for Settings button */
+  width: auto;
+  margin-left: auto;
+  margin-right: 0;
 }
 
 /* Error Styles */

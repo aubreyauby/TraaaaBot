@@ -8,6 +8,7 @@ const { Client,
   ApplicationCommandOptionType 
 } = require('discord.js');
 const strikeSchema = require('../../models/strike');
+const Configure = require('../../models/configure')
 const fs = require('fs');
 const ongoingStrikeProcesses = new Map();
 
@@ -29,20 +30,21 @@ module.exports = {
       if (target.bot) {
         const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
             .setDescription(`:x: <@${target.id}> is a bot.`)
-            .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+            .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
         return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
       }
 
       if (!interaction.guild.members.cache.has(target.id)) {
         const notInServerEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
           .setDescription(`:x: <@${target.id}> is not on this server and cannot be given a strike.`)
-          .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+          .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
         return await interaction.reply({ embeds: [notInServerEmbed], ephemeral: true });
       }
 
       if (ongoingStrikeProcesses.has(userId)) {
         const ongoingStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
-        .setDescription(`:x: You already have an ongoing strike process. Please complete it before starting a new one.`)
+          .setDescription(`:x: You already have an ongoing strike process. Please complete it before starting a new one.`)
+          .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
         return await interaction.reply({ embeds: [ongoingStrikeEmbed], ephemeral: true });
       }
 
@@ -51,21 +53,18 @@ module.exports = {
 
       try {
         const confirmButton = new ButtonBuilder().setCustomId('confirm').setLabel('Yes').setStyle(ButtonStyle.Primary);
-        const cancelButton = new ButtonBuilder().setCustomId('cancel').setLabel('No, strike now').setStyle(ButtonStyle.Secondary);
+        const cancelButton = new ButtonBuilder().setCustomId('cancel').setLabel('No').setStyle(ButtonStyle.Secondary);
         const forgetAboutIt = new ButtonBuilder().setCustomId('forgetAboutIt').setLabel('Cancel').setStyle(ButtonStyle.Danger);
 
         const row = new ActionRowBuilder().addComponents(confirmButton, cancelButton, forgetAboutIt);
 
         const attachmentEmbed = {
             color: 0x3498db,
-            title: `Add attachments for ${options.getUser('member').username}'s strike?`,
-            description: `:question: Would you like to provide attachments for <@${options.getUser('member').id}>'s strike? This would allow <@${options.getUser('member').id}> and your moderators to see detailed evidence of why a strike was given.\n\n:warning: If you submit attachments by a Discord link, they will be accessible until they are deleted. You cannot modify attachments after the strike was given.`,
-            thumbnail: {
-                url: options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
-            },
+            title: `Add Attachments`,
+            description: `:question: Would you like to add attachments for <@${target.id}>'s strike? This would allow them and server moderators to see detailed evidence of why a strike was given.\n\n:warning: If you submit attachments by a Discord link, they will be accessible until they are deleted. You cannot modify attachments after the strike was given.`,
             author: {
-              name: options.getUser('member').username, 
-              iconURL: options.getUser('member').avatarURL()
+              name: target.tag, 
+              iconURL: target.avatarURL()
             }
         };
 
@@ -78,14 +77,11 @@ module.exports = {
             const attachmentSendEmbed = {
               color: 0x00FF00,
               title: `Awaiting Submissions`,
-              description: `To submit attachments, send them in this channel and I'll process them to add to the strike.\n\nYour message containing the attachments will be instantly deleted, so you do not have to worry about doing it yourself. \n\nThis request will expire after two minutes of no activity. It will expire <t:${Math.floor((Date.now() + 2 * 60 * 1000) / 1000)}:R>.`,
-              thumbnail: {
-                url: options.getUser('member').displayAvatarURL({
-                  dynamic: true,
-                  format: 'png',
-                  size: 4096,
-                }),
-              },
+              description: `🕗 To submit attachments, send them in the next message and TraaaaBot will process them. Your message containing the attachments will be instantly deleted, so you do not have to worry about doing it yourself.\n\nThe following attachment types are accepted: \`.png\`, \`.jpg\`, \`.jpeg\`, \`.gif\`\n\nThis request will expire after two minutes of no activity. It will expire <t:${Math.floor((Date.now() + 2 * 60 * 1000) / 1000)}:R>.`,
+              author: {
+                name: target.tag, 
+                iconURL: target.avatarURL()
+              }
             };
 
             interaction.editReply({embeds: [attachmentSendEmbed], components: []});
@@ -98,25 +94,25 @@ module.exports = {
               const attachment = msg.attachments.first();
 
               const submissionConfirmationEmbed = new EmbedBuilder().setColor(0xA3A3A3).setTitle(`Submission Received`)
-                .setDescription(`We have received your submission(s) for ${options.getUser('member').username}'s strike. \n\nPlease wait while we process your attachments and prepare a confirmation...`)
-                .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                .setDescription(`We have received your submission(s) for <@${target.id}>'s strike. \n\nPlease wait while we process them and prepare the strike confirmation for you...`)
+                .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
 
               await interaction.editReply({ embeds: [submissionConfirmationEmbed], components: [] });
 
-              const attachmentBuffer = await fetch(attachment.url).then((response) => response.arrayBuffer() );
-            
+              const attachmentBuffer = await fetch(attachment.url).then((response) => response.arrayBuffer());
+
               const attachmentPath = '../../strikersc/';
               const fileName = `${attachmentPath}${attachment.name}`;
-            
+              
               if (!fs.existsSync(attachmentPath)) { fs.mkdirSync(attachmentPath, { recursive: true }); }
-            
+              
               fs.writeFileSync(fileName, Buffer.from(attachmentBuffer));
-
+              
               const acceptedExtensions = ['png', 'jpeg', 'jpg', 'gif'];
               const fileExtension = attachment.name.split('.').pop().toLowerCase();
               if (acceptedExtensions.includes(fileExtension)) {
                   try {
-                    const { options, guildId } = interaction;
+                    const { guildId } = interaction;
 
                     try {
                       data = await strikeSchema.findOne({ guildID: guildId, userID: target.id, userTag: target.tag }).lean();
@@ -125,14 +121,14 @@ module.exports = {
                       if (data && data.strikeCount !== undefined) { strikeCount = data.strikeCount + 1; }
                     
                       const submitStrike = new ButtonBuilder().setCustomId('submitStrike').setLabel('Submit').setStyle(ButtonStyle.Primary);
-                      const cancelStrike = new ButtonBuilder().setCustomId('cancelStrike').setLabel('Cancel').setStyle(ButtonStyle.Secondary);
+                      const cancelStrike = new ButtonBuilder().setCustomId('cancelStrike').setLabel('Cancel').setStyle(ButtonStyle.Danger);
                       const row = new ActionRowBuilder().addComponents(submitStrike, cancelStrike);
 
                       const imageEmbed = new EmbedBuilder().setColor(0x00FF00)
-                      .setTitle(`Verify Strike Information`)
-                      .setDescription(`Your attachment has been successfully uploaded for <@${options.getUser('member').id}>'s strike. Please review the following and confirm whether all the strike details are correct.`)
+                      .setTitle(`Verify Strike`)
+                      .setDescription(`Your attachment has been successfully uploaded for <@${target.id}>'s strike. Please review the following and confirm whether all the strike details are correct.`)
                       .setImage(`attachment://${attachment.name}`)
-                      .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
+                      .setAuthor({ name: target.username, iconURL: target.avatarURL() })
                       .addFields(
                         { name: 'Strike', value: `**${strikeCount}**`, inline: true },
                         { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
@@ -140,8 +136,8 @@ module.exports = {
                       ); 
 
                       interaction.editReply({embeds: [imageEmbed], files: [fileName], components: [row]}); 
-
                       const submitCollector = interaction.channel.createMessageComponentCollector({ filter, time: 999999999 });
+
                       submitCollector.on('collect', async (dbi) => {
                           if (dbi.customId === 'submitStrike') {
                             let data = await strikeSchema.findOne({ guildID: guildId, userID: target.id, userTag: target.tag });
@@ -155,18 +151,16 @@ module.exports = {
                                 content: [strikeContent],
                               });
                             } else {
-                              // If data exists, update it
                               data.content.push(strikeContent);
                               data.strikeCount += 1;
                             }
                             
-                            // Save the data
                             await data.save();
               
                             const dmEmbed = new EmbedBuilder()
-                            .setTitle(`Strike Notification`)
-                            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**.`)
-                            .setThumbnail(interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }))
+                            .setTitle(`Strike Notice`)
+                            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**. For more information on this strike, please contact the staff members of the server.`)
+                            .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }) })
                             .setImage(`attachment://${attachment.name}`)
                             .setColor(0xFF0000)
                             .setTimestamp()
@@ -181,9 +175,9 @@ module.exports = {
                             } catch (dmError) { if (dmError.code === 50007) return sentDMConfirmation = "❌ DMs Disabled"; }
                   
                             const interactionEmbed = new EmbedBuilder()
-                              .setTitle(`Strike Confirmation`)
-                              .setDescription(`✅ **${target.username}** (<@${target.id}>) has been striked.`)
-                              .setThumbnail(target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
+                              .setTitle(`Strike Successful`)
+                              .setDescription(`✅ <@${target.id}> has been striked.`)
+                              .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
                               .setImage(`attachment://${attachment.name}`)
                               .setColor(0x00FF00)
                               .addFields(
@@ -195,40 +189,51 @@ module.exports = {
 
                               interaction.editReply({ embeds: [interactionEmbed], ephemeral: true, components: [] });
 
-                              if (config && config.logChannel && config.logIsEnabled) {
-                                const logChannel = client.guilds.cache.get(guildId)?.channels.cache.get(config.logChannel);
-                        
-                              if (logChannel) {
-                                    const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
-                                    .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }))
-                                    .setDescription(`:scales: <@${user.id}> has issued a strike to <@${target.id}>`)
+                              if (config && config.modlogChannel && config.modlogIsEnabled) {
+                                const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
+                                    .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
+                            
+                                let descriptionText = `:scales: <@${user.id}> has issued a strike to <@${target.id}>`;
+                            
+                                if (user.id === target.id) {
+                                    descriptionText = `:scales: <@${user.id}> has self-struck themselves! Talk about taking accountability for their own actions!`;
+                                }
+                            
+                                logEmbed.setDescription(descriptionText)
+                                    .setTimestamp()
                                     .addFields(
                                         { name: 'Strike Count', value: `**${data.strikeCount}**`, inline: true },
                                         { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
                                         { name: 'Reason', value: reason, inline: false }
-                                    )
-                                    .setTimestamp();
-                        
-                                    logChannel.send({ embeds: [logEmbed] });
-                                }
-                              }
+                                    );
+                            
+                                const modlogChannel = interaction.guild.channels.cache.get(config.modlogChannel);
+                                if (modlogChannel) { modlogChannel.send({ embeds: [logEmbed] }); }
+                            }
 
-                              ongoingStrikeProcesses.delete(userId, interaction);
-                              submitCollector.stop(); attachmentCollector.stop(); collector.stop();
-                              return;
+                            ongoingStrikeProcesses.delete(userId, interaction);
+                            submitCollector.stop(); attachmentCollector.stop(); collector.stop();
+
+                            try { fs.unlinkSync(fileName);
+                            } catch (err) { console.error(`Error deleting ${fileName}: ${err.message}`); }
+
+                            return;
                           } else if (dbi.customId === 'cancelStrike') {
                               const cancelEmbed = new EmbedBuilder()
                                   .setColor(0x00FF00)
                                   .setTitle(`Success`)
-                                  .setDescription(`:white_check_mark: The strike operation has been cancelled and ${target.username} will not receive a strike.`)
-                                  .setThumbnail(target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                                  .setDescription(`:white_check_mark: The strike operation has been cancelled and <@${target.id}> will not receive a strike.`)
+                                  .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
                               
                               interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
 
                               ongoingStrikeProcesses.delete(userId, interaction);
-                              submitCollector.stop();
-                              attachmentCollector.stop();
-                              collector.stop();
+                              submitCollector.stop(); attachmentCollector.stop(); collector.stop();
+
+                              try {
+                                fs.unlinkSync(fileName);
+                              } catch (err) { console.error(`Error deleting ${fileName}: ${err.message}`); }
+
                               return;
                           }
                       });
@@ -240,10 +245,10 @@ module.exports = {
                         const dbrow = new ActionRowBuilder().addComponents(dbsubmitStrike, dbcancelStrike);
                         
                         const dbimageEmbed = new EmbedBuilder().setColor(0x00FF00)
-                        .setTitle(`Verify Strike Information`)
+                        .setTitle(`Verify Strike`)
                         .setDescription(`Your attachment has been successfully uploaded. Please review the following and confirm whether all the strike details are correct.\n\n:warning: Submitting a strike with an internal error: \`\`\`${error.message}\`\`\``)
                         .setImage(`attachment://${attachment.name}`)
-                        .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
+                        .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
                         .addFields(
                           { name: 'Strike', value: `\`${error.message}\``, inline: false },
                           { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
@@ -273,9 +278,9 @@ module.exports = {
                             await data.save();
               
                             const dmEmbed = new EmbedBuilder()
-                            .setTitle(`Strike Notification`)
-                            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**.`)
-                            .setThumbnail(interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }))
+                            .setTitle(`Strike Notice`)
+                            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**. For more information on this strike, please contact the staff members of the server.`)
+                            .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }) })
                             .setImage(`attachment://${attachment.name}`)
                             .setColor(0xFF0000)
                             .setTimestamp()
@@ -294,8 +299,8 @@ module.exports = {
                   
                             const interactionEmbed = new EmbedBuilder()
                               .setTitle(`Strike Confirmation`)
-                              .setDescription(`✅ **${target.username}** (<@${target.id}>) has been striked.`)
-                              .setThumbnail(target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
+                              .setDescription(`✅ <@${target.id}> has been striked.`)
+                              .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
                               .setImage(`attachment://${attachment.name}`)
                               .setColor(0x00FF00)
                               .addFields(
@@ -306,31 +311,54 @@ module.exports = {
                               );
 
                               interaction.editReply({ embeds: [interactionEmbed], ephemeral: true, components: [] });
+                              
+                              const config = await Configure.findOne({ guildId: interaction.guild.id });
+                              if (config && config.logChannel && config.logIsEnabled) {
+                        
+                              if (config && config.modlogChannel && config.modlogIsEnabled) {
+                                  const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
+                                      .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
+                              
+                                  let descriptionText = `:scales: <@${user.id}> has issued a strike to <@${target.id}>`;
+                              
+                                  if (user.id === target.id) {
+                                      descriptionText = `:scales: <@${user.id}> has self-struck themselves! Talk about taking accountability for their own actions!`;
+                                  }
+                              
+                                  logEmbed.setDescription(descriptionText)
+                                      .setTimestamp()
+                                      .addFields(
+                                          { name: 'Strike Count', value: `**${data.strikeCount}**`, inline: true },
+                                          { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
+                                          { name: 'Reason', value: reason, inline: false }
+                                      );
+                              
+                                  const modlogChannel = interaction.guild.channels.cache.get(config.modlogChannel);
+                                  if (modlogChannel) { modlogChannel.send({ embeds: [logEmbed] }); }
+                              }
 
-                              // Terminate all processes
                               ongoingStrikeProcesses.delete(userId, interaction);
                               submitCollector.stop(); attachmentCollector.stop(); collector.stop();
                               return;
                           } else if (dbi.customId === 'dbcancelStrike') {
                             const cancelEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle(`Success`)
-                              .setDescription(`:white_check_mark: The strike operation has been cancelled and ${options.getUser('member').username} will not receive a strike.`)
-                              .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                              .setDescription(`:white_check_mark: The strike operation has been cancelled and <@${target.id}> will not receive a strike.`)
+                              .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
                             
                               interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
 
-                            // Terminate all processes
                             ongoingStrikeProcesses.delete(userId, interaction);
                             dbsubmitCollector.stop(); attachmentCollector.stop(); collector.stop();
                             return;
                           }
-                        });
+                        }});
                     }
                   } catch (error) { console.log(error.stack);}
               } else {
                 const invalidAttachmentEmbed = new EmbedBuilder().setColor(0xFF0000)
                   .setTitle(`Invalid Attachment`)
                   .setDescription(`The attachment you provided (\`${attachment.name}\`) is not a valid attachment. Please submit images or GIFs and try again.\n\nAccepted formats:\n\`.png\`, \`.jpg\`, \`.jpeg\`, \`.gif\``)
-                  .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                  .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
         
                 const invalidAttachmentRow = new ActionRowBuilder().addComponents(forgetAboutIt);
         
@@ -344,7 +372,7 @@ module.exports = {
                 const timeoutEmbed = new EmbedBuilder().setColor(0xFF0000)
                   .setTitle(`Error`)
                   .setDescription(`:x: You did not submit any attachments within the time limit. The strike request has timed out.`)
-                  .setThumbnail(options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }));
+                  .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
                 
                 interaction.editReply({ embeds: [timeoutEmbed], components: [] });
                 
@@ -357,6 +385,8 @@ module.exports = {
             
           } else if (i.customId === 'cancel') {
             let data = await strikeSchema.findOne({guildID: guildId, userID: target.id, userTag: target.tag});
+            const serverId = interaction.guild.id;
+            const config = await Configure.findOne({ guildId: serverId });
 
             if (!data) {
               data = new strikeSchema({
@@ -374,9 +404,9 @@ module.exports = {
             await data.save();
 
             const dmEmbed = new EmbedBuilder()
-            .setTitle(`Strike Notification`)
-            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**.`)
-            .setThumbnail(interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }))
+            .setTitle(`Strike Notice`)
+            .setDescription(`❗ You have received a strike in **${interaction.guild.name}**. For more information on this strike, please contact the staff members of the server.`)
+            .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL({ dynamic: true, format: 'png', size: 4096 }) })
             .setColor(0xFF0000)
             .setTimestamp()
             .addFields(
@@ -395,7 +425,7 @@ module.exports = {
             const interactionEmbed = new EmbedBuilder()
               .setTitle(`Strike Confirmation`)
               .setDescription(`✅ <@${target.id}> has been striked.`)
-              .setThumbnail(target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }))
+              .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
               .setColor(0x00FF00)
               .addFields(
                   { name: 'Strike', value: `**${data.strikeCount}**`, inline: true },
@@ -404,18 +434,41 @@ module.exports = {
                   { name: 'Delivered to DM?', value: sentDMConfirmation, inline: false },
               );
 
-              interaction.editReply({ embeds: [interactionEmbed], ephemeral: true, components: [] });
+              if (config && config.modlogChannel && config.modlogIsEnabled) {
+                const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
+                    .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
+            
+                let descriptionText = `:scales: <@${user.id}> has issued a strike to <@${target.id}>`;
+            
+                if (user.id === target.id) {
+                    descriptionText = `:scales: <@${user.id}> has self-struck themselves! Talk about taking accountability for their own actions!`;
+                }
+            
+                logEmbed.setDescription(descriptionText)
+                    .setTimestamp()
+                    .addFields(
+                        { name: 'Strike Count', value: `**${data.strikeCount}**`, inline: true },
+                        { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
+                        { name: 'Reason', value: reason, inline: false }
+                    );
+            
+                const modlogChannel = interaction.guild.channels.cache.get(config.modlogChannel);
+                if (modlogChannel) { modlogChannel.send({ embeds: [logEmbed] }); }
+            }
 
-              ongoingStrikeProcesses.delete(userId, interaction);
-              collector.stop();
-              return;            
+            interaction.editReply({ embeds: [interactionEmbed], ephemeral: true, components: [] });
+
+            ongoingStrikeProcesses.delete(userId, interaction);
+            collector.stop();
+            return;            
           } else if (i.customId === 'forgetAboutIt') {
               const cancelEmbed = {
                   color: 0x00FF00,
                   title: `Success`,
-                  description: `:white_check_mark: The strike operation has been cancelled and <@${options.getUser('member').id}> will not receive a strike.`,
-                  thumbnail: {
-                      url: options.getUser('member').displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                  description: `:white_check_mark: The strike operation has been cancelled and <@${target.id}> will not receive a strike.`,
+                  author: {
+                    name: target.tag, 
+                    iconURL: target.avatarURL()
                   }
               };
               interaction.editReply({ embeds: [cancelEmbed], components: [] });
@@ -434,7 +487,7 @@ module.exports = {
       {
           name: "member",
           description: "The member to strike.",
-          type: ApplicationCommandOptionType.Mentionable,
+          type: ApplicationCommandOptionType.User,
           required: true
       },
       {

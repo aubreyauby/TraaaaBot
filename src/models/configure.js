@@ -28,5 +28,4 @@ const configureSchema = new Schema({
     }
 });
 
-
 module.exports = model('Configure', configureSchema);

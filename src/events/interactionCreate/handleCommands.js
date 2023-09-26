@@ -76,7 +76,7 @@ module.exports = async (client, interaction) => {
     const stackLines = error.stack.split('\n');
     const lineInfo = stackLines[1].match(/:(\d+):\d+/);
     const lineNumber = lineInfo ? lineInfo[1] : "N/A";
-    const errorMessage = `\x1b[1;31mERROR \x1b[0mAn error was thrown in line ${lineNumber}:\n${error.stack}`;
+    const errorMessage = `\x1b[1;91mERROR \x1b[0;91mAn error was thrown in line ${lineNumber}:\n${error.stack}`;
     console.log(errorMessage);
   }
 };

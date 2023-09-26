@@ -4,7 +4,7 @@
   "copyright": "2023 © GXX: by electrasys",
   "version": "1.0.0",
   "description": "A multipurpose Discord bot written in discord.js that focuses on moderation, server management, and fun commmands for the public.",
-  "main": "TraaaaBot.console/TraaaaBotConsole.js",
+  "main": "traaaabot.console/TraaaaBotConsole.js",
   "scripts": {
     "start": "concurrently \"npm run start-server\" \"npm run start-electron\"",
     "start-server": "node server.js",

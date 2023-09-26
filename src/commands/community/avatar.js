@@ -8,52 +8,41 @@ module.exports = {
      */
     callback: async (client, interaction) => {
         try {
-            // Get the member argument (mentionable user) from the interaction
             const memberArg = interaction.options.get('member');
 
-            // Check if memberArg is not null and is an object with a valid user property (indicating a user mention)
             if (memberArg !== null && typeof memberArg === 'object' && memberArg.user) {
-                // Retrieve the mentioned user
                 const user = memberArg.user;
 
-                // Build an embed with the user's avatar
                 const avatarEmbed = new EmbedBuilder()
                     .setColor(0x3498db)
                     .setTitle(`${user.tag}'s Avatar`)
                     .setImage(user.displayAvatarURL({ dynamic: true, size: 1024 }))
+                    .setDescription(`[Open in browser](${user.displayAvatarURL({ dynamic: true, size: 1024 })})`)
+                    .setTimestamp()
                     .setFooter({ text: `User ID: ${user.id}` });
 
-                // Send the embed as a response
                 await interaction.reply({ embeds: [avatarEmbed] });
             } else if (memberArg === null) {
-                // Handle the case where no member argument was provided (defaults to user's avatar)
                 const user = interaction.user;
 
-                // Build an embed with the user's avatar
                 const avatarEmbed = new EmbedBuilder()
                     .setColor(0x3498db)
                     .setTitle(`${user.tag}'s Avatar`)
                     .setImage(user.displayAvatarURL({ dynamic: true, size: 1024 }))
+                    .setDescription(`[Open in browser](${user.displayAvatarURL({ dynamic: true, size: 1024 })})`)
+                    .setTimestamp()
                     .setFooter({ text: `User ID: ${user.id}` });
 
-                // Send the embed as a response
                 await interaction.reply({ embeds: [avatarEmbed] });
-            } else {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(0xFF0000)
-                    .setTitle('Error')
-                    .setDescription(':x: You specified a role. Please specify a valid user to view their avatar.');
-
-                await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
             }
         } catch (error) {
-            // Handle other errors by sending an error embed
-            const errorEmbed = new EmbedBuilder()
-                .setColor(0xFF0000)
-                .setTitle('Error')
-                .setDescription(':x: An error occurred. Please check the command usage and try again later.');
+            const errorEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle('Error')
+                .setDescription(
+                    `:x: An error occurred while trying to run this command:\n\`\`\`${error.message}\`\`\`\nThis is an internal error. Please contact the developers of TraaaaBot and report this issue. You are also able to continue using this command if the command could not run due to a typo, or any invalid arguments that were given.`
+                );
 
             await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+            console.log(error);
         }
     },
     name: 'avatar',
@@ -62,7 +51,7 @@ module.exports = {
         {
             name: "member",
             description: "The member to view the avatar of.",
-            type: ApplicationCommandOptionType.Mentionable,
+            type: ApplicationCommandOptionType.User,
             required: false
         }
     ]

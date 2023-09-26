@@ -76,9 +76,7 @@ module.exports = {
     
       const player = createAudioPlayer();
     
-      const resource = createAudioResource(streamUrl, {
-        inputType: 2,
-      });
+      const resource = createAudioResource(streamUrl, { inputType: 2 });
     
       player.play(resource);
     
@@ -87,9 +85,8 @@ module.exports = {
       const nowPlayingEmbed = new EmbedBuilder()
         .setColor(0x9d5cff)
         .setAuthor({name: "TraaaaBot Music", iconURL: client.user.displayAvatarURL()})
-        .setDescription(`Now listening to **${stationName}**.`)
         .setThumbnail(stationIconUrl)
-        .setTitle(`🎵 Now playing in <#${channel.id}>`)
+        .setTitle(`Now playing in <#${channel.id}>: ${stationName}`)
         .addFields(
           { name: 'Requested By', value: `<@${interaction.user.id}>`, inline: false },
           { name: 'Station Owner', value: ownerName, inline: true }

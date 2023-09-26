@@ -4,6 +4,7 @@ const { Client,
     ButtonStyle,
     ActionRowBuilder,
     PermissionFlagsBits,
+    EmbedBuilder,
     ApplicationCommandOptionType } = require('discord.js');
 const strikeSchema = require('../../models/strike');
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
         if (target.bot) {
             const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
                 .setDescription(`:x: <@${target.id}> is a bot.`)
-                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+                .setAuthor({ name: target.tag, iconURL: target.avatarURL()});
             return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
         }
 
@@ -35,8 +36,9 @@ module.exports = {
                 color: 0xFF0000,
                 title: `Error`,
                 description: `❌ <@${target.id}> does not have any strikes.`,
-                thumbnail: {
-                    url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                author: {
+                    name: target.tag, 
+                    iconURL: target.avatarURL()
                 }
             };
             return await interaction.reply({ embeds: [noStrikesEmbed], ephemeral: true });
@@ -59,7 +61,10 @@ module.exports = {
             title: 'Warning',
             description: `:warning: Are you sure you want to clear <@${target.id}>'s strikes? They will not be notified that their strikes were cleared from the server.\n\n<@${target.id}> currently has ${userStrikes.strikeCount === 1 ? '**1** strike' : `**${userStrikes.strikeCount}** strikes`}.`,
             footer: {text: 'Are you looking to remove a specific strike? The command is /rstrike.'},
-            thumbnail: { url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 }) }
+            author: {
+                name: target.tag, 
+                iconURL: target.avatarURL()
+            }
         };
 
         await interaction.reply({ embeds: [confirmEmbed], components: [row], ephemeral: true });
@@ -79,8 +84,9 @@ module.exports = {
                     color: 0x00ff00,
                     title: `Success`,
                     description: `:white_check_mark: <@${target.id}>'s strikes have been cleared from ${interaction.guild.name}.`,
-                    thumbnail: {
-                        url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                    author: {
+                        name: target.tag, 
+                        iconURL: target.avatarURL()
                     }
                 };
 
@@ -93,8 +99,9 @@ module.exports = {
                     color: 0x00ff00,
                     title: `Success`,
                     description: `:white_check_mark: Clear strike operation for <@${target.id}> was cancelled.`,
-                    thumbnail: {
-                        url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                    author: {
+                        name: target.tag, 
+                        iconURL: target.avatarURL()
                     }
                 };
                 interaction.editReply({ embeds: [cancelEmbed], components: [] });
@@ -109,8 +116,9 @@ module.exports = {
                     color: 0xFF0000,
                     title: `Error`,
                     description: `:x: Strike clear confirmation timed out. <@${target.id}> will not have their strikes cleared from this server.`,
-                    thumbnail: {
-                        url: target.displayAvatarURL({ dynamic: true, format: 'png', size: 4096 })
+                    author: {
+                        name: target.tag, 
+                        iconURL: target.avatarURL()
                     }
                 };
 

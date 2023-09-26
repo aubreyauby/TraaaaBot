@@ -134,7 +134,7 @@ const serverConfigs = {};
       if (config && config.modlogChannel && config.modlogIsEnabled) {
         const messageEditedEmbed = new EmbedBuilder()
           .setColor(0x00FF00)
-          .setTitle(`Message edited in <#${newMessage.channel.id}>`)
+          .setTitle(`Message Edited in <#${newMessage.channel.id}>`)
           .setAuthor({ name: newMessage.author.tag, iconURL: newMessage.author.avatarURL() })
           .setTimestamp()
           .setDescription(`**Before:** ${oldMessage.content}\n**After:** ${newMessage.content}\n\n[Jump to Message](https://discord.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`)
@@ -149,7 +149,6 @@ const serverConfigs = {};
     client.on('messageDelete', async (deletedMessage) => {
       try {
         if (deletedMessage.author.id === client.user.id) {
-          // Exclude messages deleted by the bot (configuration messages)
           return;
         }
     
@@ -159,7 +158,7 @@ const serverConfigs = {};
         if (config && config.modlogChannel && config.modlogIsEnabled) {
           const messageDeleteEmbed = new EmbedBuilder()
             .setColor(0xEE4B2B)
-            .setTitle(`Message deleted in <#${deletedMessage.channel.id}>`)
+            .setTitle(`Message Deleted in <#${deletedMessage.channel.id}>`)
             .setAuthor({ name: deletedMessage.author.tag, iconURL: deletedMessage.author.avatarURL() })
             .setDescription(`**Content:** ${deletedMessage.content}\n\n`)
             .setTimestamp()
@@ -197,7 +196,8 @@ const serverConfigs = {};
           if (oldMember.displayName !== newMember.displayName) {
             const nicknameChangeEmbed = new EmbedBuilder()
               .setColor(0xFF69B4)
-              .setTitle('Nickname changed')
+              .setTitle(`Nickname Changed for ${newMember.user.tag}`)
+              .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() })
               .setDescription(`**Before:** ${oldMember.displayName}\n**After:** ${newMember.displayName}`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.id}` });
@@ -229,7 +229,7 @@ const serverConfigs = {};
     // Logging: Server profile picture changes
     client.on('guildMemberUpdate', async (oldMember, newMember) => {
       if (oldMember.avatarURL() === newMember.avatarURL()) {
-          console.log("User didn't changed avatar");
+          return;
       } else {
         const serverIds = client.guilds.cache.map(guild => guild.id);
         const configPromises = serverIds.map(guildId => Configure.findOne({ guildId }));
@@ -243,10 +243,10 @@ const serverConfigs = {};
           if (config && config.modlogChannel && config.modlogIsEnabled) {
             const profilePictureChangeEmbed = new EmbedBuilder()
               .setColor(0xFF69B4)
-              .setTitle(`Server-Specific Avatar Changed`)
+              .setTitle(`Server Avatar Changed for ${newMember.user.tag}`)
               .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
               .setThumbnail(newMember.avatarURL())
-              .setDescription(`<@${newMember.user.id}> changed their avatar specifically for ${newMember.guild.name}.`)
+              .setDescription(`<@${newMember.user.id}> changed their local avatar for ${newMember.guild.name}.`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.user.id}` });
     
@@ -272,7 +272,7 @@ const serverConfigs = {};
           if (addedRoles.size > 0) {
             addedRoles.forEach(async (role) => {
               const rolesAddedEmbed = new EmbedBuilder().setColor(0x3498db).setTitle('Role Added')
-                .setDescription(`Role added to <@${newMember.id}>: ${role.toString()}`)
+                .setDescription(`<@${newMember.id}> was given a role: ${role.toString()}`)
                 .setFooter({ text: `User ID: ${newMember.id}` })
                 .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() })
                 .setTimestamp();
@@ -296,7 +296,7 @@ const serverConfigs = {};
           if (removedRoles.size > 0) {
             const removedRolesNames = removedRoles.map((role) => role.toString()).join(', ');
             const rolesRemovedEmbed = new EmbedBuilder().setColor(0xEE4B2B).setTitle('Role Removed')
-              .setDescription(`Role removed from <@${newMember.id}>: ${removedRolesNames}`)
+              .setDescription(`<@${newMember.id}> was removed from a role: ${removedRolesNames}`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.id}` })
               .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() });
@@ -397,29 +397,28 @@ const serverConfigs = {};
           if (config && config.modlogChannel && config.modlogIsEnabled) {
             let channelType = '';
             let title = '';
+            let parentCategory = '';
     
             if (channel.type === ChannelType.GuildText) {
               channelType = 'Text Channel';
-              title = `Text Channel Created: <#${channel.id}>`;
+              title = `📝 Text Channel Created: <#${channel.id}>`;
             } else if (channel.type === ChannelType.GuildVoice) {
               channelType = 'Voice Channel';
-              title = `Voice Channel Created: <#${channel.id}>`;
+              title = `🔊 Voice Channel Created: <#${channel.id}>`;
             } else if (channel.type === ChannelType.GuildCategory) {
               channelType = 'Category';
-              title = `Category Created: ${channel.name}`;
+              title = `🗃️ Category Created: ${channel.name}`;
             }
-    
-            const channelCreateEmbed = new EmbedBuilder()
-              .setColor(0x3498db)
-              .setTitle(title)
-              .setDescription(`**Type:** ${channelType}\n**ID:** ${channel.id}`)
-              .setAuthor({ name: channel.guild.name, iconURL: channel.guild.iconURL() })
-              .setTimestamp();
     
             if (channel.type !== ChannelType.GuildCategory && channel.parent) {
-              channelCreateEmbed.addFields({ name: 'Parent Category', value: channel.parent.name });
+              parentCategory = channel.parent.name;
             }
-            channelCreateEmbed.addFields({ name: 'Timestamp', value: `<t:${Math.floor(channel.createdAt / 1000)}:F>` });
+            const channelCreateEmbed = new EmbedBuilder()
+            .setColor(0x3498db)
+            .setTitle(title)
+            .setDescription(`**Type:** ${channelType}\n**ID:** ${channel.id}\n**Parent Category:** ${parentCategory || 'None'}\n**Timestamp:** <t:${Math.floor(channel.createdAt / 1000)}:F>`)
+            .setAuthor({ name: channel.guild.name, iconURL: channel.guild.iconURL() })
+            .setTimestamp();
     
             if (channel.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
               try {
@@ -434,9 +433,7 @@ const serverConfigs = {};
             }
     
             const modlogChannel = channel.guild.channels.cache.get(config.modlogChannel);
-            if (modlogChannel) {
-              modlogChannel.send({ embeds: [channelCreateEmbed] });
-            }
+            if (modlogChannel) { modlogChannel.send({ embeds: [channelCreateEmbed] }); }
           }
         }
       } catch (error) {
@@ -454,29 +451,29 @@ const serverConfigs = {};
           if (config && config.modlogChannel && config.modlogIsEnabled) {
             let channelType = '';
             let title = '';
+            let parentCategory = '';
     
             if (channel.type === ChannelType.GuildText) {
               channelType = 'Text Channel';
-              title = `Text Channel Deleted: ${channel.name}`;
+              title = `📝 Text Channel Deleted: ${channel.name}`;
             } else if (channel.type === ChannelType.GuildVoice) {
               channelType = 'Voice Channel';
-              title = `Voice Channel Deleted: ${channel.name}`;
+              title = `🔊 Voice Channel Deleted: ${channel.name}`;
             } else if (channel.type === ChannelType.GuildCategory) {
               channelType = 'Category';
-              title = `Category Deleted: ${channel.name}`;
+              title = `🗃️ Category Deleted: ${channel.name}`;
             }
-    
-            const channelDeleteEmbed = new EmbedBuilder()
-              .setColor(0xEE4B2B)
-              .setTitle(title)
-              .setDescription(`**Type:** ${channelType}\n**ID:** ${channel.id}`)
-              .setAuthor({ name: channel.guild.name, iconURL: channel.guild.iconURL() })
-              .setTimestamp();
     
             if (channel.type !== ChannelType.GuildCategory && channel.parent) {
-              channelDeleteEmbed.addFields({ name: 'Parent Category', value: channel.parent.name });
+              parentCategory = channel.parent.name;
             }
-            channelDeleteEmbed.addFields({ name: 'Timestamp', value: `<t:${Math.floor(channel.createdAt / 1000)}:F>` });
+
+            const channelDeleteEmbed = new EmbedBuilder()
+            .setColor(0xEE4B2B)
+            .setTitle(title)
+            .setDescription(`**Type:** ${channelType}\n**ID:** ${channel.id}\n**Parent Category:** ${parentCategory || 'None'}\n**Timestamp:** <t:${Math.floor(channel.createdAt / 1000)}:F>`)
+            .setAuthor({ name: channel.guild.name, iconURL: channel.guild.iconURL() })
+            .setTimestamp();
     
             if (channel.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
               try {
@@ -491,14 +488,10 @@ const serverConfigs = {};
             }
     
             const modlogChannel = channel.guild.channels.cache.get(config.modlogChannel);
-            if (modlogChannel) {
-              modlogChannel.send({ embeds: [channelDeleteEmbed] });
-            }
+            if (modlogChannel) { modlogChannel.send({ embeds: [channelDeleteEmbed] }); }
           }
         }
-      } catch (error) {
-        console.error('\x1b[1;91mERROR \x1b[0;91mError in channelDelete event:', error);
-      }
+      } catch (error) { console.error('\x1b[1;91mERROR \x1b[0;91mError in channelDelete event:', error); }
     });    
 
     // Logging: Profile picture changes
@@ -524,9 +517,7 @@ const serverConfigs = {};
               .setFooter({ text: `User ID: ${newUser.id}` });
     
             const modlogChannel = client.guilds.cache.get(serverId)?.channels.cache.get(config.modlogChannel);
-            if (modlogChannel) {
-              modlogChannel.send({ embeds: [profilePictureChangeEmbed] });
-            }
+            if (modlogChannel) { modlogChannel.send({ embeds: [profilePictureChangeEmbed] }); }
           }
         }
       }
@@ -585,9 +576,7 @@ const serverConfigs = {};
             modlogChannel.send({ embeds: [inviteCreateEmbed] });
           }
         }
-      } catch (error) {
-        console.error('\x1b[1;91mERROR \x1b[0;91mError in inviteCreate event:', error);
-      }
+      } catch (error) { console.error('\x1b[1;91mERROR \x1b[0;91mError in inviteCreate event:', error); }
     });
 
     // Logging: Invites deleted
@@ -759,7 +748,7 @@ const serverConfigs = {};
       }
     });
         
-    } else { console.log('\x1b[1;91mERROR \x1b[0;91mAttempts to connect to the MongoDB database have been disabled.\x1b[0m'); }
+    } else { console.log('\x1b[1;91mERROR \x1b[0;91mAttempts to connect to the MongoDB database have been disabled. Guilds will be unable to access their guild-specific configurations of the bot, use the ranking system, or strike members.\x1b[0m'); }
 
     eventHandler(client);
     client.login(process.env.TOKEN);
