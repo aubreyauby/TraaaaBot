@@ -23,30 +23,30 @@ module.exports = {
         if (target.bot) {
             const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
                 .setDescription(`:x: <@${target.id}> is a bot.`)
-                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+                .setAuthor({name: target.tag, iconURL: target.avatarURL()});
             return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
         }
 
         const noStrikes = new EmbedBuilder()
-            .setTitle(`${target.tag}'s Strike Logs`)
-            .setColor(0x00FF00)
+            .setTitle(`Error`)
+            .setColor(0xFF0000)
             .setTimestamp()
-            .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
-            .setDescription(`✅ <@${target.id}> has no strikes!\n\nThank you for following the rules.`)
+            .setAuthor({name: target.tag, iconURL: target.avatarURL()})
+            .setDescription(`:x: <@${target.id}> has no strikes.`)
             .setFooter({text: `User ID: ${target.id}`})
             
         const viewYourOwn = new EmbedBuilder()
             .setColor(0xFF0000)
-            .setDescription(`❌ You do not have permission to view the strike logs of other members.`)
+            .setDescription(`:x: You do not have permission to view the strike logs of other members.`)
 
-        if (target.id !== invoker.id && !member.permissions.has(PermissionsBitField.Flags.ManageMessages)) { return interaction.reply({ embeds: [viewYourOwn] }); }
+        if (target.id !== invoker.id && !member.permissions.has(PermissionsBitField.Flags.ManageMessages)) { return interaction.reply({ embeds: [viewYourOwn], ephemeral: true }); }
 
         if (data) {
             const embed = new EmbedBuilder()
             .setTitle(`${target.tag}'s Strike Logs`)
             .setColor(0xFF0000)
             .setTimestamp()
-            .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 1024 }))
+            .setAuthor({name: target.tag, iconURL: target.avatarURL()})
             .setDescription(`❗ <@${target.id}> has **${data.strikeCount}** ${data.strikeCount === 1 ? 'strike' : 'strikes'} in **${interaction.guild.name}**.\n${data.content.map(
                 (w, i) => 
                 `
@@ -66,9 +66,9 @@ module.exports = {
             try {
                 await interaction.reply({ embeds: [noStrikes], ephemeral: true });
             } catch (err) {
-                const errorEmbed = new EmbedBuilder()
+                const strikesCrashError = new EmbedBuilder()
                 .setDescription(`❌ This command threw an error. Please report this error to the developers.\n\`\`\`${err}\`\`\``)
-                interaction.reply({ embeds: [errorEmbed], ephemeral: true })
+                interaction.reply({ embeds: [strikesCrashError], ephemeral: true })
             }
         }
     },
@@ -79,7 +79,7 @@ module.exports = {
         {
             name: "member",
             description: "The member to view the strikes of.",
-            type: ApplicationCommandOptionType.Mentionable,
+            type: ApplicationCommandOptionType.User,
             required: false
         }
     ]

@@ -32,7 +32,6 @@ module.exports = async (client, interaction) => {
         } else { commandUsageCounts.set(usageKey, { timestamp, count: count + 1 }); }
       }
     } else {
-      // Initialize the command count for the user and command
       commandUsageCounts.set(usageKey, { timestamp: Date.now(), count: 1 });
     }
 

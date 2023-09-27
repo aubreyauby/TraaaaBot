@@ -196,9 +196,9 @@ const serverConfigs = {};
           if (oldMember.displayName !== newMember.displayName) {
             const nicknameChangeEmbed = new EmbedBuilder()
               .setColor(0xFF69B4)
-              .setTitle(`Nickname Changed for ${newMember.user.tag}`)
+              .setTitle(`Nickname Changed`)
               .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() })
-              .setDescription(`**Before:** ${oldMember.displayName}\n**After:** ${newMember.displayName}`)
+              .setDescription(`**User:**<@${newMember.user.id}>\n**Before:** ${oldMember.displayName}\n**After:** ${newMember.displayName}`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.id}` });
 
@@ -243,10 +243,10 @@ const serverConfigs = {};
           if (config && config.modlogChannel && config.modlogIsEnabled) {
             const profilePictureChangeEmbed = new EmbedBuilder()
               .setColor(0xFF69B4)
-              .setTitle(`Server Avatar Changed for ${newMember.user.tag}`)
+              .setTitle(`Server Avatar Changed`)
               .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.displayAvatarURL() })
               .setThumbnail(newMember.avatarURL())
-              .setDescription(`<@${newMember.user.id}> changed their local avatar for ${newMember.guild.name}.`)
+              .setDescription(`<@${newMember.user.id}> changed their server avatar.`)
               .setTimestamp()
               .setFooter({ text: `User ID: ${newMember.user.id}` });
     
@@ -272,7 +272,7 @@ const serverConfigs = {};
           if (addedRoles.size > 0) {
             addedRoles.forEach(async (role) => {
               const rolesAddedEmbed = new EmbedBuilder().setColor(0x3498db).setTitle('Role Added')
-                .setDescription(`<@${newMember.id}> was given a role: ${role.toString()}`)
+                .setDescription(`<@${newMember.id}> was added to a role: ${role.toString()}`)
                 .setFooter({ text: `User ID: ${newMember.id}` })
                 .setAuthor({ name: newMember.user.tag, iconURL: newMember.user.avatarURL() })
                 .setTimestamp();
@@ -284,7 +284,7 @@ const serverConfigs = {};
                   rolesAddedEmbed.addFields({ name: 'Updated By', value: `<@${auditLogEntry.executor.id}>` });
                 } catch (error) {
                   console.error(error);
-                  if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) { return; }
+                  if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) return;
                 }
               }
 
@@ -308,7 +308,7 @@ const serverConfigs = {};
                 rolesRemovedEmbed.addFields({ name: 'Updated By', value: `<@${auditLogEntry.executor.id}>` });
               } catch (error) {
                 console.error(error);
-                if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) { return; }
+                if (error.message.includes("Cannot read properties of undefined (reading 'fetchAuditLogs')")) return;
               }
             }
 
@@ -654,7 +654,8 @@ const serverConfigs = {};
     
             const statusChangeEmbed = {
               color: 0xFF0000,
-              title: 'Lookout Advisory - Status Change',
+              title: 'Status Change',
+              author: { name: newPresence.user.tag, iconURL: newPresence.user.avatarURL() },
               description: `‼️ <@${userId}> is now ${statusEmoji} **${status}**.`,
               timestamp: new Date(),
               footer: { text: `User ID: ${userId}` },
@@ -685,9 +686,7 @@ const serverConfigs = {};
         // Fetch user's lookout status from the database
         const lookoutUser = await Lookout.findOne({ userID: userId });
     
-        if (!lookoutUser || !lookoutUser.lookOutEnabled) {
-          return; // If the user isn't on lookout, exit early
-        }
+        if (!lookoutUser || !lookoutUser.lookOutEnabled) return;
     
         const config = await Configure.findOne({ guildId: serverId });
     
@@ -701,12 +700,15 @@ const serverConfigs = {};
     
               const joinEmbed = {
                 color: 0xFF0000,
-                title: 'Lookout Advisory - Joined Voice Channel',
+                title: 'Joined Voice Channel',
                 description: `‼️ <@${userId}> joined a voice channel: ${joinChannel}`,
                 timestamp: new Date(),
                 footer: { text: `User ID: ${userId}` },
               };
-    
+              joinEmbed.author = {
+                name: newState.member.user.tag,
+                iconURL: newState.member.user.avatarURL(),
+              };
               lookoutLogChannel.send({ embeds: [joinEmbed] }).catch(console.error);
             } else if (oldState.channelId && !newState.channelId) {
               // User left a voice channel
@@ -714,28 +716,33 @@ const serverConfigs = {};
     
               const leaveEmbed = {
                 color: 0xFF0000,
-                title: 'Lookout Advisory - Left Voice Channel',
+                title: 'Left Voice Channel',
                 description: `‼️ <@${userId}> left a voice channel: ${leaveChannel}`,
                 timestamp: new Date(),
                 footer: { text: `User ID: ${userId}` },
               };
-    
+              leaveEmbed.author = {
+                name: newState.member.user.tag,
+                iconURL: newState.member.user.avatarURL(),
+              };
               lookoutLogChannel.send({ embeds: [leaveEmbed] }).catch(console.error);
             } else if (oldState.channelId !== newState.channelId) {
               // User switched voice channels
               const oldChannel = oldState.channel ? `<#${oldState.channelId}>` : 'N/A';
               const newChannel = newState.channel ? `<#${newState.channelId}>` : 'N/A';
     
-              // Check if both old and new channels are not 'N/A' before logging
               if (oldChannel !== 'N/A' && newChannel !== 'N/A') {
                 const switchEmbed = {
                   color: 0xFF0000,
-                  title: 'Lookout Advisory - Switched Voice Channel',
+                  title: 'Switched Voice Channel',
                   description: `‼️ <@${userId}> switched from ${oldChannel} to ${newChannel}.`,
                   timestamp: new Date(),
                   footer: { text: `User ID: ${userId}` },
                 };
-    
+                switchEmbed.author = {
+                  name: newState.member.user.tag, 
+                  iconURL: newState.member.user.avatarURL(), 
+                };
                 lookoutLogChannel.send({ embeds: [switchEmbed] }).catch(console.error);
               }
             }
@@ -746,7 +753,7 @@ const serverConfigs = {};
       } catch (error) {
         console.error('Error fetching lookout status from the database:', error);
       }
-    });
+    });    
         
     } else { console.log('\x1b[1;91mERROR \x1b[0;91mAttempts to connect to the MongoDB database have been disabled. Guilds will be unable to access their guild-specific configurations of the bot, use the ranking system, or strike members.\x1b[0m'); }
 

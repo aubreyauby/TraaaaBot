@@ -1,4 +1,4 @@
-const { Client, Interaction, EmbedBuilder, ApplicationCommandOptionType, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
+const { EmbedBuilder, ApplicationCommandOptionType, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
 const Configure = require('../../models/configure');
 const configSessions = new Map();
 
@@ -9,8 +9,11 @@ module.exports = {
         if (commandName === 'config') {
             const modlogsOption = interaction.options.get('modlogs');
             const lookoutOption = interaction.options.get('lookout');
+            const banOption = interaction.options.get('ban');
+            const kickOption  = interaction.options.get('kick');
+            const starboardOption = interaction.options.get('starboard');
 
-            if (!modlogsOption && !lookoutOption) {
+            if (!modlogsOption && !lookoutOption && !banOption && !kickOption && !starboardOption) {
                 const guild = interaction.guild;
                 const guildIconURL = guild.iconURL();
 
@@ -24,28 +27,49 @@ module.exports = {
                         + `**Example:** \`/config modlogs: Enable\` (this will enable moderation logs for the server)`)
                     .setThumbnail(guildIconURL);
 
-                await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
-                return;
+                return await interaction.reply({ embeds: [helpEmbed], ephemeral: true });
             }
 
             const modlogsValue = modlogsOption ? modlogsOption.value : null;
             const lookoutValue = lookoutOption ? lookoutOption.value : null;
+            const banValue = banOption ? banOption.value : null;
+            const kickValue = kickOption ? kickOption.value : null;
+            const starboardValue = starboardOption ? starboardOption.value : null;
 
             const userId = interaction.user.id;
             const guildId = interaction.guild.id;
-            let configureDoc = await Configure.findOne({ userId, guildId });
+            let configureDoc = await Configure.findOne({ guildId });
 
             if (!configureDoc) {
                 configureDoc = new Configure({
-                    userId,
                     guildId,
+                    // moderation logs
                     modlogIsEnabled: false,
                     modlogChannel: '',
+                    pingRoles: '',
+                    // lookout
+                    lookoutLogChannel: '',
+                    // starboard
+                    starboardIsEnabled: false,
+                    starboardChannel: '',
+                    starboardThreshold: '',
+                    starboardDeleteUnderThreshold: false,
+                    starboardSpoilerMark: false,
+                    starboardEmojiID: '',
+                    starboardEmojiReaction: '',
+                    starboardLeaderboards: false,
+                    starboardDetectWords: '',
+                    starboardDetectMedia: '',
+                    starboardAgeLimit: '',
                 });
-                await configureDoc.save();
+                try {
+                    await configureDoc.save();
+                } catch (error) {
+                    console.error("Error while saving new configuration:", error);
+                }
             }
 
-            const updatedConfigureDoc = await Configure.findOne({ userId, guildId });
+            const updatedConfigureDoc = await Configure.findOne({ guildId });
             
             if (modlogsValue === 1) {
                 // Enable logging and add audit log access information
@@ -66,7 +90,7 @@ module.exports = {
                 const modlogDisableEmbed = new EmbedBuilder().setColor('#00FF00').setTitle('Success')
                     .setDescription(':white_check_mark: Moderation logs have been **disabled** for this server.');
 
-                await Configure.findOneAndDelete({ userId: interaction.user.id, guildId: interaction.guild.id });
+                await Configure.findOneAndDelete({ guildId: interaction.guild.id });
 
                 await interaction.reply({ embeds: [modlogDisableEmbed], ephemeral: true });
             } else if (modlogsValue === 3) {
@@ -326,7 +350,7 @@ module.exports = {
 
                         try {
                             const configureDoc = await Configure.findOneAndUpdate(
-                                { userId, guildId },
+                                { guildId },
                                 { lookoutLogChannel: mentionedChannel.id },
                                 { new: true }
                             );
@@ -356,6 +380,8 @@ module.exports = {
                         await interaction.editReply({ embeds: [timeoutEmbed], ephemeral: true });
                     }
                 });
+            } else if (starboardValue === 1) {
+                
             }
         }
     },
@@ -382,6 +408,26 @@ module.exports = {
             choices: [
                 { name: "Set a channel to post lookout logs", value: 1 },
                 { name: "Warn members in DMs that they've been placed on lookout (default: OFF)", value: 2 },
+            ]
+        },
+        {
+            name: "starboard",
+            description: "Starboard is a great way to promote the best content of the server, showcasing it in a channel.",
+            type: ApplicationCommandOptionType.Integer,
+            required: false,
+            choices: [
+                { name: "Start configuration wizard for Starboard", value: 1 },
+                { name: "Toggle starboard for this server", value: 2 },
+                { name: "Set a channel to post starboards", value: 3 },
+                { name: "Set threshold needed to starboard", value: 4 },
+                { name: "Delete starboard if number of starboard emojis fall below threshold", value: 5 },
+                { name: "Spoiler mark starboard posts if the original content is spoiler marked", value: 6 },
+                { name: "Override default emoji (⭐) with a custom emoji", value: 7 },
+                { name: "Append emoji reaction for members to add stars via the assigned channel", value: 8 },
+                { name: "Leaderboards for most starboard posts by member", value: 9 },
+                { name: "[filter] Detect words or phrases that should not be posted in starboard", value: 10 },
+                { name: "[filter] Detect types of media that should not be posted in starboard", value: 11 },
+                { name: "[filter] Set an age limit for posts that can be posted in starboard", value: 12 },
             ]
         },
         {

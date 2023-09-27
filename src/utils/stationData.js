@@ -5,6 +5,12 @@ module.exports = {
         countryCode: "US",
         ownerName: "WGBH Educational Foundation",
     },
+    wjmf: {
+      streamUrl: "https://wgbh-live.streamguys1.com/classical-hi?uuid=jo37cazfr",
+      stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/bb08cc6/2147483647/strip/true/crop/1281x855+0+0/resize/180x120!/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Flegacy%2Fsites%2Fwcrb%2Ffiles%2F202009%2FCRB_Classical995_rgb_white.png",
+      countryCode: "US",
+      ownerName: "Bryant University",
+    },
     wucf: {
         streamUrl: "https://peridot.streamguys1.com:7835/WUCF",
         stationIconUrl: "https://images.squarespace-cdn.com/content/v1/55df6138e4b0cc963b8f6f56/1659611015648-NLMQ7KO9028VIH1B5IRN/WUCF-generic-white.png",
@@ -22,6 +28,18 @@ module.exports = {
         stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/beeb54a/2147483647/strip/true/crop/456x236+0+0/resize/464x240!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fa6%2Ffb%2F97f9ae064c1abbdc457e80006763%2Fcai-logo-2020-01.png",
         countryCode: "US",
         ownerName: "WGBH Educational Foundation",
+    },
+    wnan: {
+      streamUrl: "https://wgbh-live.streamguys1.com/wcai?uuid=m64ipu4tp",
+      stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/beeb54a/2147483647/strip/true/crop/456x236+0+0/resize/464x240!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fa6%2Ffb%2F97f9ae064c1abbdc457e80006763%2Fcai-logo-2020-01.png",
+      countryCode: "US",
+      ownerName: "WGBH Educational Foundation",
+    },
+    wzai: {
+      streamUrl: "https://wgbh-live.streamguys1.com/wcai?uuid=m64ipu4tp",
+      stationIconUrl: "https://npr.brightspotcdn.com/dims4/default/beeb54a/2147483647/strip/true/crop/456x236+0+0/resize/464x240!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fa6%2Ffb%2F97f9ae064c1abbdc457e80006763%2Fcai-logo-2020-01.png",
+      countryCode: "US",
+      ownerName: "WGBH Educational Foundation",
     },
     wbz: {
         streamUrl: "https://stream.revma.ihrhls.com/zc7729/hls.m3u8?streamid=7729&zip=&aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=7652891546&clientType=web&companionAds=false&deviceName=web-mobile&dist=iheart&host=webapp.US&listenerId=&playedFrom=157&pname=live_profile&profileId=7652891546&stationid=7729&terminalId=159&territory=US",
@@ -310,6 +328,36 @@ module.exports = {
       stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/2/2a/KALX_%28FM%29_logo.png",
       countryCode: "US",
       ownerName: "University of California",
+    },
+    cfiq: {
+      streamUrl: "https://corus.leanstream.co/CFIQAM-MP3?type=.mp3&playertype=dplayer",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/en/e/eb/Global_News_Radio_640_Toronto.png",
+      countryCode: "CA",
+      ownerName: "Corus Entertainment"
+    },
+    cbcl: {
+      streamUrl: "https://cbcradiolive.akamaized.net/hls/live/2041029/ES_R1ELD/master.m3u8",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Cbc_radio_one_london.svg/440px-Cbc_radio_one_london.svg.png",
+      countryCode: "CA",
+      ownerName: "Canadian Broadcasting Corporation"
+    },
+    cbx: {
+      streamUrl: "https://cbcradiolive.akamaized.net/hls/live/2041041/ES_R1MED/master.m3u8",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Cbc_radio_one_edmonton.svg/440px-Cbc_radio_one_edmonton.svg.png",
+      countryCode: "CA",
+      ownerName: "Canadian Broadcasting Corporation"
+    },
+    kmxb: {
+      streamUrl: "https://live.amperwave.net/manifest/audacy-kmxbfmaac-hlsc.m3u8?apv=a2&dist=Audacy&source=webA2&gpp=DBABrGA~BVQqAAAACWA.QA~BUoAAAJY.QA~BVoAABY~BVoAAFg.QA~BVKAAAWA~BVoAAAFg.QA&deviceid=app%3Af8k%3A62e560ce22cbef552521883e914636f3&c_user_id=f8k%3A62e560ce22cbef552521883e914636f3",
+      stationIconUrl: "https://upload.wikimedia.org/wikipedia/commons/9/92/Mix_94.1.png",
+      countryCode: "US",
+      ownerName: "Audacy, Inc."
+    },
+    wcno: {
+      streamUrl: "https://ice23.securenetsystems.net/WCNO?playSessionID=6E49251D-119D-45DB-956E875EB5A7319E",
+      stationIconUrl: "https://www.wcno.com/images/u9726-5.png?crc=377939723",
+      countryCode: "US",
+      ownerName: "National Christian Network, Inc."
     }
   };
   

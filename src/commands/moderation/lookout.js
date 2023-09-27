@@ -10,7 +10,7 @@ module.exports = {
         if (target.bot) {
             const botStrikeEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
                 .setDescription(`:x: <@${target.id}> is a bot.`)
-                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+                .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
             return await interaction.reply({ embeds: [botStrikeEmbed], ephemeral: true });
         }
 
@@ -28,9 +28,9 @@ module.exports = {
                 // Send a confirmation message
                 const successEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
                     .setDescription(`:white_check_mark: <@${target.id}> has been ${action} the lookout list.`)
-                    .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+                    .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
 
-                return await interaction.reply({ embeds: [successEmbed] });
+                return await interaction.reply({ embeds: [successEmbed], ephemeral: true });
             }
 
             // Get the guild's configuration
@@ -56,13 +56,13 @@ module.exports = {
             // Send a confirmation message
             const successEmbed = new EmbedBuilder().setColor(0x00FF00).setTitle('Success')
                 .setDescription(`:white_check_mark: <@${target.id}> has been added to the lookout list.`)
-                .setThumbnail(target.displayAvatarURL({ format: 'png', dynamic: true, size: 4096 }));
+                .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
 
             await interaction.reply({ embeds: [successEmbed] });
         } catch (error) {
             console.error(`Error toggling user lookout status: ${error}`);
             const errorEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Error`)
-                .setDescription(`An error occurred while toggling <@${target.id}>'s lookout status.`);
+                .setDescription(`:x: An error occurred while toggling <@${target.id}>'s lookout status:\n\`\`\`${error.message}\`\`\``);
 
             await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }

@@ -116,7 +116,7 @@ module.exports = {
 
         await guild.members.kick(target);
 
-        return interaction.reply({ embeds: [userKickedEmbed] });
+        return interaction.reply({ embeds: [userKickedEmbed], ephemeral: true });
       } catch (error) {
         if (error.code === 50013) {
           const missingPermError = new EmbedBuilder()
@@ -124,7 +124,7 @@ module.exports = {
             .setColor(0xff0000)
             .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
             .setDescription(
-              `:x: **${target.tag}** (<@${target.id}>) is positioned above TraaaaBot in the roles hierarchy. To kick this member using TraaaaBot, you need to move TraaaaBot's role on top of every role that will be kickable by this command.`
+              `:x: <@${target.id}> is positioned above TraaaaBot in the roles hierarchy. To kick this member using TraaaaBot, you need to move TraaaaBot's role on top of every role that will be kickable by this command.`
             );
 
           return interaction.reply({

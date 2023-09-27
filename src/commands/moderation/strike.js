@@ -186,13 +186,21 @@ module.exports = {
                                   { name: 'Reason', value: reason, inline: false },
                                   { name: 'Delivered to DM?', value: sentDMConfirmation, inline: false },
                               );
+                              
+                              const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
+                              .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
+                              .setImage(`attachment://${attachment.name}`)
+                              .setTimestamp()
+                              .addFields(
+                                  { name: 'Strike Count', value: `**${data.strikeCount}**`, inline: true },
+                                  { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
+                                  { name: 'Reason', value: reason, inline: false }
+                              );
 
                               interaction.editReply({ embeds: [interactionEmbed], ephemeral: true, components: [] });
 
-                              if (config && config.modlogChannel && config.modlogIsEnabled) {
-                                const logEmbed = new EmbedBuilder().setColor(0xFF0000).setTitle(`Member Striked`)
-                                    .setAuthor({ name: target.tag, iconURL: target.avatarURL() });
-                            
+                              const config = await Configure.findOne({ guildId: interaction.guild.id });
+                              if (config && config.modlogChannel && config.modlogIsEnabled) {                            
                                 let descriptionText = `:scales: <@${user.id}> has issued a strike to <@${target.id}>`;
                             
                                 if (user.id === target.id) {
@@ -200,22 +208,24 @@ module.exports = {
                                 }
                             
                                 logEmbed.setDescription(descriptionText)
-                                    .setTimestamp()
-                                    .addFields(
-                                        { name: 'Strike Count', value: `**${data.strikeCount}**`, inline: true },
-                                        { name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
-                                        { name: 'Reason', value: reason, inline: false }
-                                    );
                             
                                 const modlogChannel = interaction.guild.channels.cache.get(config.modlogChannel);
-                                if (modlogChannel) { modlogChannel.send({ embeds: [logEmbed] }); }
+                                if (modlogChannel) { 
+                                  modlogChannel.send({ embeds: [logEmbed], components: [], files: [fileName] }); 
+                                }
                             }
 
                             ongoingStrikeProcesses.delete(userId, interaction);
                             submitCollector.stop(); attachmentCollector.stop(); collector.stop();
 
-                            try { fs.unlinkSync(fileName);
-                            } catch (err) { console.error(`Error deleting ${fileName}: ${err.message}`); }
+                            setTimeout(() => {
+                              try {
+                                fs.unlinkSync(fileName);
+                                console.log(`Deleted ${fileName}`);
+                              } catch (err) {
+                                console.error(`Error deleting ${fileName}: ${err.message}`);
+                              }
+                            }, 2000);
 
                             return;
                           } else if (dbi.customId === 'cancelStrike') {
@@ -225,7 +235,7 @@ module.exports = {
                                   .setDescription(`:white_check_mark: The strike operation has been cancelled and <@${target.id}> will not receive a strike.`)
                                   .setAuthor({ name: target.tag, iconURL: target.avatarURL() })
                               
-                              interaction.editReply({ embeds: [cancelEmbed], files: [], components: [] });
+                              interaction.editReply({ embeds: [cancelEmbed] });
 
                               ongoingStrikeProcesses.delete(userId, interaction);
                               submitCollector.stop(); attachmentCollector.stop(); collector.stop();
