@@ -1,9 +1,5 @@
 <a name="readme-top"></a>
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+<h1>DEVELOPMENT ON THIS PROJECT HAS BEEN DISCONTINUED AND WILL NO LONGER BE UPDATED. THIS REPOSITORY IS NOW PUBLIC FOR HISTORICAL PURPOSES, AS IS.</h1>
 
 <!-- TraaaaBot Logo -->
 <div align="center">
